@@ -14,7 +14,7 @@ listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"
 class GameApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Game Info App")
+        self.title("Game Center")
         self.attributes('-fullscreen', True)
         self.configure(fg_color="black")
         self.protocol("WM_DELETE_WINDOW", lambda: None)
@@ -26,19 +26,23 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        #self.after(500,self.set_focus())
-        self.set_focus()
+        self.after(500,self.set_focus)
         
         self.update_idletasks()
+        # self.set_focus()
+               
         self.last_closing_attempt = time.time()
 
         # Start with splash screen
         self.show_splash_screen()
     
     def set_focus(self):
-        # self.focus_force()
+        self.focus_force()
         self.attributes('-topmost',True)
-
+        self.attributes('-fullscreen',True)
+        self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
+        self.update_idletasks()
+        
     def show_splash_screen(self):
         # Splash screen content
         self.splash_frame = ctk.CTkFrame(self, fg_color="#000000")
@@ -255,12 +259,14 @@ class GameApp(ctk.CTk):
 
             if game_info:
                 game_path = game_info["path"]
+                print(game_path)
                 
                 if game_info["type"] == "python":
                     os.system(f"python {game_path}")  # Run Pygame game
                     
                 elif game_info["type"] == "emulator":
-                    os.system(f"mgba-qt {game_path}")  # Run GBA/GB game with mGBA emulator
+                    
+                    os.system(f"/usr/games/mgba-qt {game_path}")  # Run GBA/GB game with mGBA emulator
 
 
             self.last_select_item = time.time()
