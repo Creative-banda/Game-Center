@@ -8,7 +8,7 @@ import ctypes, pathlib
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+#listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -180,6 +180,13 @@ class GameApp(ctk.CTk):
         self.bind("<KeyPress-s>", self.move_down)
         self.bind("<KeyPress-space>", self.select_item)
         self.bind("<KeyPress-Escape>", self.close_window)
+    
+    
+    # Function to Read and return the txt file
+    
+    def read_txt(self, game_name):
+        with open(f"{current_path}/games/games_texts/{game_name}.txt", 'r') as file:
+            return file.read()
         
     
     def update_selection(self):
@@ -187,7 +194,7 @@ class GameApp(ctk.CTk):
             if i == self.selected_index:
                 button.set_selected(True)
 
-                image_path = f"{current_path}/games/games_images/{button.cget('text')}.png"
+                image_path = f"{current_path}/games/games_images/{button.cget('text')}.jpg"
                 image_width = int(self.screen_width * 0.5)
                 image_height = int(self.screen_height * 0.4)
 
@@ -196,10 +203,10 @@ class GameApp(ctk.CTk):
                     args=(image_path, image_width, image_height),
                     daemon=True
                 ).start()
-
+                text = self.read_txt(button.cget('text'))
                 self.desc_label.configure(
                     text=f"{button.cget('text')}\n"
-                         f"A classic arcade game that challenges your reflexes and strategy."
+                         f"{text}"
                 )
 
                 button.update_idletasks()
@@ -281,8 +288,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            #listener.terminate()
+            #listener.wait()
             
         self.last_closing_attempt = current_time
 
