@@ -45,11 +45,48 @@ pip install --break-system-packages --upgrade --force-reinstall pillow
 
 ## Auto-Launch Setup
 
-The Game Center is configured to automatically launch when your Raspberry Pi starts up. This provides a seamless gaming experience without requiring manual program execution.
+To configure the Game Center to start automatically on boot, you'll need to create a systemd service. Follow these steps:
+
+1. Create a new service file:
+```bash
+sudo nano /etc/systemd/system/gamecenter.service
+```
+
+2. Add the following content to the file (replace `<USER>` and `<PATH>` with your values):
+```ini
+[Unit]
+Description=Game Center GUI Application
+After=multi-user.target
+
+[Service]
+User=<USER>
+Group=<USER>
+WorkingDirectory=<PATH>/GUI
+ExecStart=/usr/bin/python3 <PATH>/GUI/main.py
+Environment=DISPLAY=:0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. Enable and start the service:
+```bash
+sudo systemctl enable gamecenter.service
+sudo systemctl start gamecenter.service
+```
+
+4. Check the service status:
+```bash
+sudo systemctl status gamecenter.service
+```
 
 ### Verifying Auto-Launch
 
-After installation, restart your Raspberry Pi to confirm that the Game Center appears automatically at system startup.
+After setting up the service, restart your Raspberry Pi to confirm that the Game Center appears automatically at system startup:
+```bash
+sudo reboot
+```
 
 ## Support
 
