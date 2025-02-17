@@ -11,7 +11,8 @@ PIN_MAPPING = {
     21: ["space"],  # RIGHT_HAND_UP → SPACEBAR
     16: ["q"],  # RIGHT_HAND_LEFT → Q
     12: ["f"],  # RIGHT_HAND_RIGHT → F
-    20: ["ctrl", "f4"]  # RIGHT_HAND_DOWN → CTRL + F4
+    20 : ["p"],
+    4: ["alt", "f4"]  # RIGHT_HAND_DOWN → CTRL + F4
 }
 
 # GPIO Setup
