@@ -8,7 +8,7 @@ import ctypes, pathlib
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+#listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -48,16 +48,42 @@ class GameApp(ctk.CTk):
         self.splash_frame = ctk.CTkFrame(self, fg_color="#000000")
         self.splash_frame.place(relx=0.5, rely=0.5, anchor="center")
         
+        # Load and resize the image
+        # Get window dimensions
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        
+        # Calculate image size (e.g., 40% of the smaller window dimension)
+        image_size = min(window_width, window_height) * 0.9
+        
+        # Load and resize the image using CTkImage
+        self.logo_image = ctk.CTkImage(
+            dark_image=Image.open(f"{current_path}/logo_2.png"),
+            size=(image_size, image_size)
+        )
+        
+        # Create label with image
         self.splash_label = ctk.CTkLabel(
             self.splash_frame,
-            text="Created by STEM Department",
-            font=("Orbitron", 40, "bold"),
-            text_color="#FFFFFF"
+            text="",  # Empty text
+            image=self.logo_image
         )
         self.splash_label.pack(pady=20)
-
+        
+        # Bind window resize event to update image size
+        self.bind('<Configure>', self.update_splash_image)
+        
         # Start fade animation
         self.fade_in()
+
+    def update_splash_image(self, event=None):
+        # Update image size when window is resized
+        window_width = self.winfo_width()
+        window_height = self.winfo_height()
+        image_size = min(window_width, window_height) * 0.4
+        
+        # Update image size
+        self.logo_image.configure(size=(image_size, image_size))
 
     def fade_in(self):
         for i in range(0, 101, 2):
@@ -106,7 +132,7 @@ class GameApp(ctk.CTk):
         # Footer
         self.footer_label = ctk.CTkLabel(
             self.main_container,
-            text="Created with excellence by the STEM Department ",
+            text="Created with ❤ by Orchids powered by STEM",
             font=("Orbitron", 20, "bold"),
             text_color="#888888"
         )
@@ -288,8 +314,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            #listener.terminate()
+            #listener.wait()
             
         self.last_closing_attempt = current_time
 
