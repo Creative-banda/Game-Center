@@ -20,9 +20,25 @@ A customizable game center built with CustomTkinter, designed to launch automati
 
 ## Follow this document and install/update your system 
 
- ```
-https://docs.google.com/document/d/1fp7zQU_905RLOjTTQ0ateuz39ZRla9nzsfx0JWYQ6ik/edit?tab=t.0
+There is Document in the root folder named Game_Center_In_Respberry.pdf, follow that document and install/update library 
+
+## Edit config file of Raspberry Pi OS Method1(Terminal - Recommended) 
+
+- Open a terminal.
+- Run:
+```bash
+sudo nano /boot/config.txt
+
 ```
+- In the root folder there is file named config.txt copy it and remove everything from your config file and paste into it
+- Make your changes, then press Ctrl + X, then Y, and hit Enter to save.
+
+
+## Edit config file of Raspberry Pi OS Method2(Use another system )
+
+- If the Pi isn’t booting, you can remove the SD card, insert it into another computer, and find config.txt in the /boot/ partition.
+- Replace that config file with the new config file from root folder
+
 
 ### Installing CustomTkinter
 
