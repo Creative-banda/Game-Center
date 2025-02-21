@@ -17,6 +17,13 @@ A customizable game center built with CustomTkinter, designed to launch automati
 - Python 3.x
 - pip3 package manager
 
+
+## Follow this document and install/update your system 
+
+ ```
+https://docs.google.com/document/d/1fp7zQU_905RLOjTTQ0ateuz39ZRla9nzsfx0JWYQ6ik/edit?tab=t.0
+```
+
 ### Installing CustomTkinter
 
 The following command is required to install CustomTkinter on Raspberry Pi:
