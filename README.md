@@ -25,6 +25,14 @@ The following command is required to install CustomTkinter on Raspberry Pi:
 sudo pip3 install customtkinter --break-system-packages
 ```
 
+### Installing Keyboard
+
+The following command is required to install Keyboard library on Raspberry Pi, This library help us to press buttons on the keyboard:
+
+```bash
+sudo pip3 install keyboard --break-system-packages
+```
+
 **Note:** Standard pip installation methods may not work correctly on Raspberry Pi OS. The `--break-system-packages` flag is necessary for proper installation.
 
 ### Troubleshooting Common Issues
