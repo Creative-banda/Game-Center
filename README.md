@@ -74,6 +74,15 @@ sudo apt install --reinstall python3-pil python3-tk
 pip install --break-system-packages --upgrade --force-reinstall pillow
 ```
 
+
+## Installing mGBA-Qt on Raspberry Pi
+
+To install **mGBA-Qt**, a lightweight and efficient Game Boy Advance emulator, run the following command in the terminal:
+
+```bash
+sudo apt install mgba-qt
+```
+
 ## Auto-Launch Setup
 
 To configure the Game Center to start automatically on boot, you'll need to create a systemd service. Follow these steps:
