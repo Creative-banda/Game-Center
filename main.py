@@ -211,8 +211,11 @@ class GameApp(ctk.CTk):
     # Function to Read and return the txt file
     
     def read_txt(self, game_name):
-        with open(f"{current_path}/games/games_texts/{game_name}.txt", 'r') as file:
-            return file.read()
+        try:
+            with open(f"{current_path}/games/games_texts/{game_name}.txt", 'r') as file:
+                return file.read()
+        except FileNotFoundError:
+            return "No Description"
         
     
     def update_selection(self):
