@@ -17,8 +17,8 @@ PIN_MAPPING = {
 
 # Define special key combinations
 KEY_COMBINATIONS = {
-    (26, 6): ["f1"],  # W (UP) + D (RIGHT) → F1
-    (19, 13): ["shift", "f1"],  # S (DOWN) + A (LEFT) → SHIFT + F1
+    (26, 20): ["f1"],  # W (UP) + P (RIGHT HAND DOWN) → F1
+    (19, 21): ["shift", "f1"],  # S (DOWN) + RIGHT_HAND_UP (Q) → SHIFT + F1
     
 }
 
