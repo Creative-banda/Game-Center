@@ -3,97 +3,95 @@
 A customizable game center built with CustomTkinter, designed to launch automatically on Raspberry Pi startup.
 
 ## Features
-
 - Modern and intuitive user interface
 - Auto-launch capability on system startup
 - Built using CustomTkinter for enhanced visual appeal
 - Optimized for Raspberry Pi systems
 
-## Installation
+---
 
-### Prerequisites
+## Installation Guide
 
-- Raspberry Pi running Raspberry Pi OS
-- Python 3.x
-- pip3 package manager
-
-
-## Follow this document and install/update your system 
-
-There is Document in the root folder named Game_Center_In_Respberry.pdf, follow that document and install/update library 
-
-## Edit config file of Raspberry Pi OS Method1(Terminal - Recommended) 
-
-- Open a terminal.
-- Run:
+### 1. System Preparation
+#### Update System Packages
+Ensure your Raspberry Pi's system packages are up to date:
 ```bash
-sudo nano /boot/config.txt
-
+sudo apt update && sudo apt upgrade -y
 ```
-- In the root folder there is file named config.txt copy it and remove everything from your config file and paste into it
-- Make your changes, then press Ctrl + X, then Y, and hit Enter to save.
 
-
-## Edit config file of Raspberry Pi OS Method2(Use another system )
-
-- If the Pi isn’t booting, you can remove the SD card, insert it into another computer, and find config.txt in the /boot/ partition.
-- Replace that config file with the new config file from root folder
-
-
-### Installing CustomTkinter
-
-The following command is required to install CustomTkinter on Raspberry Pi:
-
+#### Install Python & Pip
+Check your current Python version:
 ```bash
+python3 --version
+```
+Update Python if needed:
+```bash
+sudo apt install python3 -y
+```
+Ensure pip is installed and updated:
+```bash
+sudo apt install python3-pip -y
+sudo python3 -m pip install --upgrade pip
+```
+
+---
+
+### 2. Install Required Libraries
+#### Install CustomTkinter
+```bash
+sudo apt install python3-tk -y
 sudo pip3 install customtkinter --break-system-packages
 ```
-
-### Installing Keyboard
-
-The following command is required to install Keyboard library on Raspberry Pi, This library help us to press buttons on the keyboard:
-
+#### Install Pygame
+```bash
+sudo apt install python3-dev libsdl2-dev libsdl2-image-dev \
+libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev \
+libjpeg-dev -y
+```
+```bash
+sudo pip3 install pygame --break-system-packages
+```
+#### Install Keyboard Library
 ```bash
 sudo pip3 install keyboard --break-system-packages
 ```
-
-**Note:** Standard pip installation methods may not work correctly on Raspberry Pi OS. The `--break-system-packages` flag is necessary for proper installation.
-
-### Troubleshooting Common Issues
-
-#### ImageTk Not Found Error
-
-If you encounter the `ImageTk not found (from PIL)` error after installing CustomTkinter, follow these steps in order:
-
-1. Reinstall Python3 PIL and Tk packages:
+#### Install GPIO Library
 ```bash
-sudo apt install --reinstall python3-pil python3-tk
+sudo apt install python3-rpi.gpio -y
 ```
-
-2. Force reinstall Pillow package:
+#### Install xdotool (For Focus Mode on Startup)
 ```bash
-pip install --break-system-packages --upgrade --force-reinstall pillow
+sudo apt install xdotool -y
 ```
-
-
-## Installing mGBA-Qt on Raspberry Pi
-
-To install **mGBA-Qt**, a lightweight and efficient Game Boy Advance emulator, run the following command in the terminal:
-
+#### Install mGBA-Qt Emulator (Game Boy Advance for External Games)
 ```bash
 sudo apt install mgba-qt
 ```
 
-## Auto-Launch Setup
+---
 
-To configure the Game Center to start automatically on boot, you'll need to create a systemd service. Follow these steps:
+### 3. Configure Raspberry Pi OS
+#### Editing the Config File (Method 1: Terminal - Recommended)
+```bash
+sudo nano /boot/config.txt
+```
+Copy the `config.txt` file from the repository root folder and replace everything in your config file with its contents. Then, save the changes:
+- Press `Ctrl + X`
+- Press `Y`
+- Hit `Enter`
 
-1. Create a new service file:
+#### Editing the Config File (Method 2: Using Another System)
+If the Pi isn’t booting, remove the SD card, insert it into another computer, and find `config.txt` in the `/boot/` partition. Replace it with the new `config.txt` from the repository.
+
+---
+
+### 4. Set Up Auto-Launch on Startup
+Create a systemd service to launch Game Center automatically:
 ```bash
 sudo nano /etc/systemd/system/gamecenter.service
 ```
-
-2. Add the following content to the file (replace `<USER>` and `<PATH>` with your values):
-```ini
+Paste the following configuration (replace `<USER>` and `<PATH>` accordingly):
+```
 [Unit]
 Description=Game Center GUI Application
 After=multi-user.target
@@ -101,33 +99,78 @@ After=multi-user.target
 [Service]
 User=<USER>
 Group=<USER>
-WorkingDirectory=<PATH>/GUI
-ExecStart=/usr/bin/python3 <PATH>/GUI/main.py
+WorkingDirectory=<PATH>
+ExecStart=/usr/bin/python3 <PATH>/main.py
 Environment=DISPLAY=:0
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 ```
-
-3. Enable and start the service:
+Save the file and enable the service:
 ```bash
 sudo systemctl enable gamecenter.service
 sudo systemctl start gamecenter.service
 ```
-
-4. Check the service status:
+Check service status:
 ```bash
 sudo systemctl status gamecenter.service
 ```
-
-### Verifying Auto-Launch
-
-After setting up the service, restart your Raspberry Pi to confirm that the Game Center appears automatically at system startup:
+Restart your Raspberry Pi to verify auto-launch:
 ```bash
 sudo reboot
 ```
 
-## Support
+---
 
+### 5. Troubleshooting Common Issues
+#### ImageTk Not Found (PIL Issue)
+If you encounter an error related to ImageTk from PIL, try:
+```bash
+sudo apt install --reinstall python3-pil python3-tk
+pip install --break-system-packages --upgrade --force-reinstall pillow
+```
+
+#### If Installation Fails
+Try cleaning the pip cache and reinstalling:
+```bash
+sudo pip3 cache purge
+sudo pip3 install pygame --force-reinstall
+sudo pip3 install customtkinter --force-reinstall
+```
+
+#### If Dependencies Are Missing
+Ensure all required dependencies are installed:
+```bash
+sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
+libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev \
+python3-setuptools python3-dev python3-tk -y
+```
+
+---
+
+### 6. Quick Installation (All-in-One Command)
+Run this single command to install everything in one go:
+```bash
+sudo apt update && sudo apt upgrade -y && \
+sudo apt install python3 -y && sudo python3 -m pip install --upgrade pip && \
+sudo apt install python3-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
+libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev -y && \
+sudo pip3 install pygame --break-system-packages && \
+sudo apt install python3-tk -y && sudo pip3 install customtkinter --break-system-packages && \
+sudo apt install python3-rpi.gpio -y && sudo apt install xdotool -y && \
+sudo apt install --reinstall python3-pil python3-tk -y && \
+pip install --break-system-packages --upgrade --force-reinstall pillow
+```
+
+### 🔹 Final Verification
+Run this command to check if all dependencies are installed successfully:
+```bash
+python3 -c "import pygame, customtkinter, RPi.GPIO; print('All libraries installed successfully!')"
+```
+
+---
+
+## Support
 If you encounter any issues or need assistance, please open an issue in the repository.
+
