@@ -12,7 +12,24 @@ A customizable game center built with CustomTkinter, designed to launch automati
 
 ## Installation Guide
 
-### 1. System Preparation
+---
+
+### 1. Configure Raspberry Pi OS
+#### Editing the Config File (Method 1: Terminal - Recommended)
+```bash
+sudo nano /boot/config.txt
+```
+Copy the `config.txt` file from the repository root folder and replace everything in your config file with its contents. Then, save the changes:
+- Press `Ctrl + X`
+- Press `Y`
+- Hit `Enter`
+
+#### Editing the Config File (Method 2: Using Another System)
+If the Pi isn’t booting, remove the SD card, insert it into another computer, and find `config.txt` in the `/boot/` partition. Replace it with the new `config.txt` from the repository.
+
+---
+
+### 2. System Preparation
 #### Update System Packages
 Ensure your Raspberry Pi's system packages are up to date:
 ```bash
@@ -36,7 +53,7 @@ sudo python3 -m pip install --upgrade pip
 
 ---
 
-### 2. Install Required Libraries
+### 3. Install Required Libraries
 #### Install CustomTkinter
 ```bash
 sudo apt install python3-tk -y
@@ -71,22 +88,7 @@ sudo apt install mgba-qt
 ```bash
 sudo apt install xdotool -y
 ```
----
 
-### 3. Configure Raspberry Pi OS
-#### Editing the Config File (Method 1: Terminal - Recommended)
-```bash
-sudo nano /boot/config.txt
-```
-Copy the `config.txt` file from the repository root folder and replace everything in your config file with its contents. Then, save the changes:
-- Press `Ctrl + X`
-- Press `Y`
-- Hit `Enter`
-
-#### Editing the Config File (Method 2: Using Another System)
-If the Pi isn’t booting, remove the SD card, insert it into another computer, and find `config.txt` in the `/boot/` partition. Replace it with the new `config.txt` from the repository.
-
----
 
 ### 4. Set Up Auto-Launch on Startup
 Create a systemd service to launch Game Center automatically:
