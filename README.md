@@ -44,30 +44,33 @@ sudo pip3 install customtkinter --break-system-packages
 ```
 #### Install Pygame
 ```bash
+sudo pip3 install pygame --break-system-packages
+```
+
+```bash
 sudo apt install python3-dev libsdl2-dev libsdl2-image-dev \
 libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev \
 libjpeg-dev -y
 ```
-```bash
-sudo pip3 install pygame --break-system-packages
-```
-#### Install Keyboard Library
-```bash
-sudo pip3 install keyboard --break-system-packages
-```
+
 #### Install GPIO Library
 ```bash
 sudo apt install python3-rpi.gpio -y
 ```
-#### Install xdotool (For Focus Mode on Startup)
+
+#### Install Keyboard Library
 ```bash
-sudo apt install xdotool -y
+sudo pip3 install keyboard --break-system-packages
 ```
 #### Install mGBA-Qt Emulator (Game Boy Advance for External Games)
 ```bash
 sudo apt install mgba-qt
 ```
 
+#### Install xdotool (For Focus Mode on Startup)
+```bash
+sudo apt install xdotool -y
+```
 ---
 
 ### 3. Configure Raspberry Pi OS
