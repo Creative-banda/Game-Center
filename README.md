@@ -12,7 +12,24 @@ A customizable game center built with CustomTkinter, designed to launch automati
 
 ## Installation Guide
 
-### 1. System Preparation
+---
+
+### 1. Configure Raspberry Pi OS
+#### Editing the Config File (Method 1: Terminal - Recommended)
+```bash
+sudo nano /boot/config.txt
+```
+Copy the `config.txt` file from the repository root folder and replace everything in your config file with its contents. Then, save the changes:
+- Press `Ctrl + X`
+- Press `Y`
+- Hit `Enter`
+
+#### Editing the Config File (Method 2: Using Another System)
+If the Pi isn’t booting, remove the SD card, insert it into another computer, and find `config.txt` in the `/boot/` partition. Replace it with the new `config.txt` from the repository.
+
+---
+
+### 2. System Preparation
 #### Update System Packages
 Ensure your Raspberry Pi's system packages are up to date:
 ```bash
@@ -36,7 +53,7 @@ sudo python3 -m pip install --upgrade pip
 
 ---
 
-### 2. Install Required Libraries
+### 3. Install Required Libraries
 #### Install CustomTkinter
 ```bash
 sudo apt install python3-tk -y
@@ -44,46 +61,34 @@ sudo pip3 install customtkinter --break-system-packages
 ```
 #### Install Pygame
 ```bash
+sudo pip3 install pygame --break-system-packages
+```
+
+```bash
 sudo apt install python3-dev libsdl2-dev libsdl2-image-dev \
 libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev \
 libjpeg-dev -y
 ```
-```bash
-sudo pip3 install pygame --break-system-packages
-```
-#### Install Keyboard Library
-```bash
-sudo pip3 install keyboard --break-system-packages
-```
+
 #### Install GPIO Library
 ```bash
 sudo apt install python3-rpi.gpio -y
 ```
-#### Install xdotool (For Focus Mode on Startup)
+
+#### Install Keyboard Library
 ```bash
-sudo apt install xdotool -y
+sudo pip3 install keyboard --break-system-packages
 ```
 #### Install mGBA-Qt Emulator (Game Boy Advance for External Games)
 ```bash
 sudo apt install mgba-qt
 ```
 
----
-
-### 3. Configure Raspberry Pi OS
-#### Editing the Config File (Method 1: Terminal - Recommended)
+#### Install xdotool (For Focus Mode on Startup)
 ```bash
-sudo nano /boot/config.txt
+sudo apt install xdotool -y
 ```
-Copy the `config.txt` file from the repository root folder and replace everything in your config file with its contents. Then, save the changes:
-- Press `Ctrl + X`
-- Press `Y`
-- Hit `Enter`
 
-#### Editing the Config File (Method 2: Using Another System)
-If the Pi isn’t booting, remove the SD card, insert it into another computer, and find `config.txt` in the `/boot/` partition. Replace it with the new `config.txt` from the repository.
-
----
 
 ### 4. Set Up Auto-Launch on Startup
 Create a systemd service to launch Game Center automatically:
