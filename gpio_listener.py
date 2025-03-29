@@ -4,22 +4,22 @@ import keyboard  # To simulate keypress events
 
 # Define GPIO pin mappings
 PIN_MAPPING = {
-    26: ["w", "up"],  # LEFT_HAND_UP → W + UP
-    19: ["s", "down"],  # LEFT_HAND_DOWN → S + DOWN
+    6: ["w", "up"],  # LEFT_HAND_UP → W + UP
+    12: ["s", "down"],  # LEFT_HAND_DOWN → S + DOWN
     13: ["a", "left"],  # LEFT_HAND_LEFT → A + LEFT
-    6: ["d", "right"],  # LEFT_HAND_RIGHT → D + RIGHT
-    21: ["space"],  # RIGHT_HAND_UP → SPACEBAR
-    16: ["q"],  # RIGHT_HAND_LEFT → Q
-    12: ["f"],  # RIGHT_HAND_RIGHT → F
-    20: ["p"],  # RIGHT_HAND_DOWN → P
-    5 : ["alt", "f4"]  # TOP_BUTTON → ALT + F4
+    19: ["d", "right"],  # LEFT_HAND_RIGHT → D + RIGHT
+    16: ["space"],  # RIGHT_HAND_UP → SPACEBAR
+    26: ["q"],  # RIGHT_HAND_LEFT → Q
+    20: ["f"],  # RIGHT_HAND_RIGHT → F
+    21: ["p"],  # RIGHT_HAND_DOWN → P
+    5: ["alt", "f4"]  # TOP_BUTTON → ALT + F4
 }
 
 # Define special key combinations
 KEY_COMBINATIONS = {
-    (26, 20): ["f1"],  # W (UP) + P (RIGHT HAND DOWN) → F1
-    (19, 21): ["shift", "f1"],  # S (DOWN) + RIGHT_HAND_UP (Q) → SHIFT + F1
-    
+    (6, 16): ["f1"],  # W (UP) + P (RIGHT HAND DOWN) → F1
+    (12, 21): ["shift", "f1"],  # S (DOWN) + RIGHT_HAND_UP (Q) → SHIFT + F1
+    (13, 19): ["enter"],
 }
 
 # GPIO Setup
