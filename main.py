@@ -121,13 +121,21 @@ class GameApp(ctk.CTk):
                 print("Update successful:", result.stdout)
                 self.status_label.configure(text="Update successful. Restarting...")
 
-                # Restart the script
-                python_executable = sys.executable  # Path to Python (e.g., /usr/bin/python3)
-                script_path = os.path.abspath(__file__)  # Get the full path of the running script
+                # Restart only if an update happened
+                self.restart_script()
 
-                os.execv(python_executable, [python_executable, script_path])  # Restart
         except Exception as e:
             print("Error updating repository:", str(e))
+
+    def restart_script(self):
+        """Restarts the script only once after an update."""
+        python_executable = sys.executable  # Path to Python
+        script_path = os.path.abspath(__file__)  # Get the full path of the running script
+
+        print(f"Restarting script: {script_path}")
+        
+        # Use execv to replace the current process (prevents infinite restart)
+        os.execv(python_executable, [python_executable, script_path])
 
 
     def transition_to_main_ui(self):
