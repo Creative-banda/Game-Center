@@ -8,7 +8,7 @@ import socket, pathlib
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -26,10 +26,10 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        # self.after(500,self.set_focus)
+        self.after(500,self.set_focus)
         
         self.update_idletasks()
-        # # self.set_focus()
+        # self.set_focus()
                
         self.last_closing_attempt = time.time()
 
@@ -43,7 +43,7 @@ class GameApp(ctk.CTk):
         self.focus_force()
         self.attributes('-topmost',True)
         self.attributes('-fullscreen',True)
-        # self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
+        self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
         self.update_idletasks()
         
     def show_splash_screen(self):
@@ -334,8 +334,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            # listener.terminate()
-            # listener.wait()
+            listener.terminate()
+            listener.wait()
             
         self.last_closing_attempt = current_time
 
