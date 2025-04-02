@@ -3,12 +3,12 @@ from PIL import Image, ImageTk
 import os, subprocess
 import time
 import threading
-import ctypes, pathlib
+import socket, pathlib
 
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -26,96 +26,113 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        self.after(500,self.set_focus)
+        # self.after(500,self.set_focus)
         
         self.update_idletasks()
-        # self.set_focus()
+        # # self.set_focus()
                
         self.last_closing_attempt = time.time()
 
         # Start with splash screen
         self.show_splash_screen()
+        
+        # Repo path
+        self.repo_path = os.path.dirname(os.path.abspath(__file__)) 
     
     def set_focus(self):
         self.focus_force()
         self.attributes('-topmost',True)
         self.attributes('-fullscreen',True)
-        self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
+        # self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
         self.update_idletasks()
         
     def show_splash_screen(self):
-        # Splash screen content
         self.splash_frame = ctk.CTkFrame(self, fg_color="#000000")
         self.splash_frame.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Load and resize the image
-        # Get window dimensions
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        
-        # Calculate image size (e.g., 40% of the smaller window dimension)
-        image_size = min(window_width, window_height) * 0.9
-        
-        # Load and resize the image using CTkImage
+        image_size = min(self.screen_width, self.screen_height) * 0.5
         self.logo_image = ctk.CTkImage(
             dark_image=Image.open(f"{current_path}/logo_2.png"),
             size=(image_size, image_size)
         )
         
-        # Create label with image
-        self.splash_label = ctk.CTkLabel(
-            self.splash_frame,
-            text="",  # Empty text
-            image=self.logo_image
-        )
+        self.splash_label = ctk.CTkLabel(self.splash_frame, text="", image=self.logo_image)
         self.splash_label.pack(pady=20)
         
-        # Bind window resize event to update image size
-        self.bind('<Configure>', self.update_splash_image)
+        self.status_label = ctk.CTkLabel(
+            self.splash_frame, text="Checking for updates...", font=("Roboto", 18), text_color="white"
+        )
+        self.status_label.pack()
         
-        # Start fade animation
         self.fade_in()
-
-    def update_splash_image(self, event=None):
-        # Update image size when window is resized
-        window_width = self.winfo_width()
-        window_height = self.winfo_height()
-        image_size = min(window_width, window_height) * 0.4
         
-        # Update image size
-        self.logo_image.configure(size=(image_size, image_size))
-
     def fade_in(self):
         for i in range(0, 101, 2):
-            if not self.transitioning:  # Check if window still exists
-                self.attributes('-alpha', i/100)
-                self.update()
-                time.sleep(0.01)
-        self.after(2000, self.fade_out)
-
+            self.attributes('-alpha', i/100)
+            self.update()
+            time.sleep(0.01)
+        
+        threading.Thread(target=self.check_for_updates, daemon=True).start()
+    
+    def check_for_updates(self):
+        self.status_label.configure(text="Checking internet connection...")
+        have_internet = self.check_internet()
+        
+        if have_internet:
+            self.status_label.configure(text="Updating console...")
+            self.update_repo()
+        else:
+            self.status_label.configure(text="No internet connection.")
+        
+        time.sleep(2)
+        
+        self.fade_out()
+    
     def fade_out(self):
         for i in range(100, -1, -2):
-            if not self.transitioning:
-                self.attributes('-alpha', i/100)
-                self.update()
-                time.sleep(0.01)
+            self.attributes('-alpha', i/100)
+            self.update()
+            time.sleep(0.01)
         self.transition_to_main_ui()
+        
+    def check_internet(self,host="8.8.8.8", port=53, timeout=3):
+        """Check if there is an active internet connection."""
+        try:
+            socket.setdefaulttimeout(timeout)
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+            self.status_label.configure(text="Connected to the internet.")
+            return True
+        except socket.error:
+            print("No internet connection.")
+            return False
+        
+
+    def update_repo(self):
+        """Pull the latest changes from the GitHub repository."""
+        try:
+            self.status_label.configure(text="Checking for updates...")
+            result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
+            print("GIT PULL RESULT",result.stdout)
+            if "Already up to date." in result.stdout:
+                print("No updates available.")
+                self.status_label.configure(text="No updates available.")
+            else:
+                print("Update successful:", result.stdout)
+                self.status_label.configure(text="Update successful.")
+        except Exception as e:
+            print("Error updating repository:", str(e))
 
     def transition_to_main_ui(self):
-        # Destroy splash elements
         self.splash_frame.destroy()
-        
-        # Build main application UI
         self.setup_main_ui()
-        
-        # Fade in main UI
         self.fade_in_main()
-
+    
     def fade_in_main(self):
         for i in range(0, 101, 2):
             self.attributes('-alpha', i/100)
             self.update()
             time.sleep(0.01)
+    
 
     def setup_main_ui(self):
         self.title("Game Info App")
@@ -317,8 +334,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
