@@ -175,7 +175,3 @@ python3 -c "import pygame, customtkinter, RPi.GPIO; print('All libraries install
 ```
 
 ---
-
-## Support
-If you encounter any issues or need assistance, please open an issue in the repository.
-
