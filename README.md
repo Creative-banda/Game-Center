@@ -7,6 +7,7 @@ A customizable game center built with CustomTkinter, designed to launch automati
 - Auto-launch capability on system startup
 - Built using CustomTkinter for enhanced visual appeal
 - Optimized for Raspberry Pi systems
+- **Auto-update system** to keep the application up-to-date with the latest changes
 
 ---
 
@@ -63,7 +64,6 @@ sudo pip3 install customtkinter --break-system-packages
 ```bash
 sudo pip3 install pygame --break-system-packages
 ```
-
 ```bash
 sudo apt install python3-dev libsdl2-dev libsdl2-image-dev \
 libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev \
@@ -89,6 +89,12 @@ sudo apt install mgba-qt
 sudo apt install xdotool -y
 ```
 
+#### Install Socket Library
+```bash
+sudo pip3 install socket --break-system-packages
+```
+
+---
 
 ### 4. Set Up Auto-Launch on Startup
 Create a systemd service to launch Game Center automatically:
@@ -128,7 +134,33 @@ sudo reboot
 
 ---
 
-### 5. Troubleshooting Common Issues
+### 5. Clone the GitHub Repository
+#### Install Git
+Before cloning the repository, install Git if it’s not already installed:
+```bash
+sudo apt install git -y
+```
+
+#### Why We Need Git
+Git allows us to download and manage the latest version of Game Center directly from the repository. This ensures we always have access to the newest features, bug fixes, and improvements. By using Git, we can easily update our application without manually downloading files.
+
+#### Clone the Repository
+To download the latest version of Game Center, clone the repository using Git:
+```bash
+git clone <REPO_URL>
+```
+Navigate into the project directory:
+```bash
+cd <REPO_FOLDER>
+```
+To pull updates in the future, run:
+```bash
+git pull
+```
+
+---
+
+### 6. Troubleshooting Common Issues
 #### ImageTk Not Found (PIL Issue)
 If you encounter an error related to ImageTk from PIL, try:
 ```bash
@@ -154,7 +186,7 @@ python3-setuptools python3-dev python3-tk -y
 
 ---
 
-### 6. Quick Installation (All-in-One Command)
+### 7. Quick Installation (All-in-One Command)
 Run this single command to install everything in one go:
 ```bash
 sudo apt update && sudo apt upgrade -y && \
@@ -165,13 +197,13 @@ sudo pip3 install pygame --break-system-packages && \
 sudo apt install python3-tk -y && sudo pip3 install customtkinter --break-system-packages && \
 sudo apt install python3-rpi.gpio -y && sudo apt install xdotool -y && \
 sudo apt install --reinstall python3-pil python3-tk -y && \
-pip install --break-system-packages --upgrade --force-reinstall pillow
+pip install --break-system-packages --upgrade --force-reinstall pillow && \
+sudo pip3 install socket --break-system-packages
 ```
 
 ### 🔹 Final Verification
 Run this command to check if all dependencies are installed successfully:
 ```bash
-python3 -c "import pygame, customtkinter, RPi.GPIO; print('All libraries installed successfully!')"
+python3 -c "import pygame, customtkinter, RPi.GPIO, socket; print('All libraries installed successfully!')"
 ```
 
----
