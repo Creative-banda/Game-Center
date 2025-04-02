@@ -29,7 +29,7 @@ class GameApp(ctk.CTk):
         self.after(500,self.set_focus)
         
         self.update_idletasks()
-        # self.set_focus()
+        self.set_focus()
                
         self.last_closing_attempt = time.time()
 
