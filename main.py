@@ -121,19 +121,15 @@ class GameApp(ctk.CTk):
                 print("Update successful:", result.stdout)
                 self.status_label.configure(text="Update successful. Restarting...")
 
-                # Restart script
-                self.restart_script()
+                # Close the current application and run update.py file
+                subprocess.Popen([sys.executable, f"{current_path}/update.py"])
+                self.quit()  # Close the current application
+
 
         except Exception as e:
             print("Error updating repository:", str(e))
 
-    def restart_script(self):
-        """Runs the script again and exits the current one."""
-        script_path = os.path.abspath(__file__)  # Get the full path of the current script
-        print(f"Restarting script: {script_path}")
-        
-        subprocess.Popen([sys.executable, script_path])  # Start new script process
-        sys.exit()  # Exit current script
+
 
 
     def transition_to_main_ui(self):
