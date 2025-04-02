@@ -85,6 +85,7 @@ sudo apt install mgba-qt
 ```
 
 #### Install xdotool (For Focus Mode on Startup)
+`xdotool` is used to simulate key presses or mouse clicks. In Game Center, it ensures that the application window gains focus automatically upon startup.
 ```bash
 sudo apt install xdotool -y
 ```
@@ -101,7 +102,7 @@ Create a systemd service to launch Game Center automatically:
 ```bash
 sudo nano /etc/systemd/system/gamecenter.service
 ```
-Paste the following configuration (replace `<USER>` and `<PATH>` accordingly):
+Paste the following configuration (replace `<USER>` with your Raspberry Pi username and `<PATH>` with the full path to the Game Center folder):
 ```
 [Unit]
 Description=Game Center GUI Application
@@ -132,6 +133,8 @@ Restart your Raspberry Pi to verify auto-launch:
 sudo reboot
 ```
 
+If you cloned the repository into a new directory, remember to update `<PATH>` in the service file accordingly.
+
 ---
 
 ### 5. Clone the GitHub Repository
@@ -142,7 +145,7 @@ sudo apt install git -y
 ```
 
 #### Why We Need Git
-Git allows us to download and manage the latest version of Game Center directly from the repository. This ensures we always have access to the newest features, bug fixes, and improvements. By using Git, we can easily update our application without manually downloading files.
+Git allows us to download and manage the latest version of Game Center directly from the repository. This ensures we always have access to the newest features, bug fixes, and improvements. By using Git, we can easily update our application without manually downloading files. Additionally, our **auto-update system** relies on Git to fetch updates seamlessly.
 
 #### Clone the Repository
 To download the latest version of Game Center, clone the repository using Git:
@@ -156,6 +159,11 @@ cd <REPO_FOLDER>
 To pull updates in the future, run:
 ```bash
 git pull
+```
+
+If you encounter permission issues while updating, try:
+```bash
+git reset --hard
 ```
 
 ---
@@ -187,7 +195,7 @@ python3-setuptools python3-dev python3-tk -y
 ---
 
 ### 7. Quick Installation (All-in-One Command)
-Run this single command to install everything in one go:
+This command installs everything in one go. However, some dependencies might be missed. If possible, copy and paste each command individually and install them one by one for better reliability.
 ```bash
 sudo apt update && sudo apt upgrade -y && \
 sudo apt install python3 -y && sudo python3 -m pip install --upgrade pip && \
