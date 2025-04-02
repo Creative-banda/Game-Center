@@ -5,6 +5,6 @@ current_path = pathlib.Path(__file__).parent.resolve()
 
 def restart_script(self):
     """Runs the script again and exits the current one."""    
-    subprocess.Popen([sys.executable, f"{current_path}/main.py"])
+    subprocess.Popen([sys.executable, f"python {current_path}/main.py"])
     sys.exit()  # Exit current script
 
