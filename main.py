@@ -3,12 +3,12 @@ from PIL import Image, ImageTk
 import os, subprocess
 import time
 import threading
-import socket, pathlib
+import socket, pathlib, sys
 
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -26,10 +26,10 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        self.after(500,self.set_focus)
+        # self.after(500,self.set_focus)
         
-        self.update_idletasks()
-        self.set_focus()
+        # self.update_idletasks()
+        # self.set_focus()
                
         self.last_closing_attempt = time.time()
 
@@ -43,7 +43,7 @@ class GameApp(ctk.CTk):
         self.focus_force()
         self.attributes('-topmost',True)
         self.attributes('-fullscreen',True)
-        self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
+        # self.after(2000, lambda: os.system("xdotool search --name 'Game Center' windowactivate"))
         self.update_idletasks()
         
     def show_splash_screen(self):
@@ -108,19 +108,27 @@ class GameApp(ctk.CTk):
         
 
     def update_repo(self):
-        """Pull the latest changes from the GitHub repository."""
+        """Pull the latest changes from the GitHub repository and restart if necessary."""
         try:
             self.status_label.configure(text="Checking for updates...")
             result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
-            print("GIT PULL RESULT",result.stdout)
+            print("GIT PULL RESULT", result.stdout)
+
             if "Already up to date." in result.stdout:
                 print("No updates available.")
                 self.status_label.configure(text="No updates available.")
             else:
                 print("Update successful:", result.stdout)
-                self.status_label.configure(text="Update successful.")
+                self.status_label.configure(text="Update successful. Restarting...")
+
+                # Restart the script
+                python_executable = sys.executable  # Path to Python (e.g., /usr/bin/python3)
+                script_path = os.path.abspath(__file__)  # Get the full path of the running script
+
+                os.execv(python_executable, [python_executable, script_path])  # Restart
         except Exception as e:
             print("Error updating repository:", str(e))
+
 
     def transition_to_main_ui(self):
         self.splash_frame.destroy()
@@ -334,8 +342,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
