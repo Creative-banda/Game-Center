@@ -122,7 +122,7 @@ class GameApp(ctk.CTk):
                 self.status_label.configure(text="Update successful. Restarting...")
 
                 # Close the current application and run update.py file
-                subprocess.Popen([sys.executable, f"{current_path}/update.py"])
+                subprocess.Popen(["python", f"{current_path}/update.py"])
                 self.quit()  # Close the current application
 
 
