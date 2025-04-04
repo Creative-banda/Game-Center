@@ -17,9 +17,10 @@ PIN_MAPPING = {
 
 # Define special key combinations
 KEY_COMBINATIONS = {
-    (6, 16): ["f1"],  # W (UP) + P (RIGHT HAND DOWN) → F1
-    (12, 21): ["shift", "f1"],  # S (DOWN) + RIGHT_HAND_UP (Q) → SHIFT + F1
-    (13, 19): ["enter"],
+    (6, 12, 16): ["f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_UP  → F1
+    (6, 12, 20): ["shift", "f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_RIGHT → F1
+    (6, 12, 21): ["enter"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_DOWN → Return(Enter)
+    (6, 12, 26): ["ctrl"+"f"], # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_LEFT → CTRL + F
 }
 
 # GPIO Setup
