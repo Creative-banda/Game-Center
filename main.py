@@ -52,7 +52,7 @@ class GameApp(ctk.CTk):
         
         image_size = min(self.screen_width, self.screen_height) * 0.5
         self.logo_image = ctk.CTkImage(
-            dark_image=Image.open(f"{current_path}/logo.png"),
+            dark_image=Image.open(f"{current_path}/logo_2.png"),
             size=(image_size, image_size)
         )
         
@@ -112,13 +112,10 @@ class GameApp(ctk.CTk):
         try:
             self.status_label.configure(text="Checking for updates...")
             result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
-            print("GIT PULL RESULT", result.stdout)
 
             if "Already up to date." in result.stdout:
-                print("No updates available.")
                 self.status_label.configure(text="No updates available.")
             else:
-                print("Update successful:", result.stdout)
                 self.status_label.configure(text="Update successful. Restarting...")
 
                 # Close the current application, startup script will run the new version
@@ -319,7 +316,6 @@ class GameApp(ctk.CTk):
 
             if game_info:
                 game_path = game_info["path"]
-                print(game_path)
                 
                 if game_info["type"] == "python":
                     os.system(f"python {game_path}")  # Run Pygame game
