@@ -110,14 +110,15 @@ class GameApp(ctk.CTk):
     def update_repo(self):
         """Pull the latest changes from the GitHub repository and restart if necessary."""
         try:
-            self.status_label.configure(text="Checking for updates...")
             result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
+            
+            self.status_label.configure(text="Checking for updates...")
 
             if "Already up to date." in result.stdout:
                 self.status_label.configure(text="No updates available.")
             else:
                 self.status_label.configure(text="Update successful. Restarting...")
-
+                time.sleep(2)
                 # Close the current application, startup script will run the new version
                 self.quit()  
 
