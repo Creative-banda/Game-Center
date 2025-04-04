@@ -184,8 +184,6 @@ class GameApp(ctk.CTk):
             if file.endswith(".py") or  file.endswith(".zip"):
                 all_games.append(file)
 
-        
-        
         for file in all_games:
             if file.endswith(".py"):
                 name = file.split(".")[0]
