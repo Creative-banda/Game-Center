@@ -52,7 +52,7 @@ class GameApp(ctk.CTk):
         
         image_size = min(self.screen_width, self.screen_height) * 0.5
         self.logo_image = ctk.CTkImage(
-            dark_image=Image.open(f"{current_path}/logo_2.png"),
+            dark_image=Image.open(f"{current_path}/logo.png"),
             size=(image_size, image_size)
         )
         
