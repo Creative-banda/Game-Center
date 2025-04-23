@@ -32,7 +32,6 @@ If the Pi isn’t booting, remove the SD card, insert it into another computer, 
 
 ### 🔧 Easy Installation Script(Automated)
 To make the setup process easier, we've created an automated Python script that installs all required libraries and dependencies for Game Center. Instead of installing each package manually, simply run the script and let it handle everything for you. This ensures a smooth and hassle-free installation experience.
-(Note) : If you are using this script so you can ignore Option 2 and 3
 ```bash
 python3 install_dependencies.py
 ```

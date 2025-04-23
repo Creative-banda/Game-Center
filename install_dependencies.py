@@ -7,11 +7,13 @@ from time import sleep
 # Function to execute commands and check for success
 def run_command(command):
     try:
+        print(f"Running command: {command}") 
         subprocess.check_call(command, shell=True)
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while executing: {command}")
         print(e)
         sys.exit(1)
+
 
 # Updating system packages
 def update_system():
