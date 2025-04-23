@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 import os, subprocess
 import time
 import threading
-import socket, pathlib, sys
+import socket, pathlib
 
 
 current_path = pathlib.Path(__file__).parent.resolve()
