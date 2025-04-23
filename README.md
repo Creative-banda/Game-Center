@@ -176,42 +176,10 @@ sudo apt install --reinstall python3-pil python3-tk
 pip install --break-system-packages --upgrade --force-reinstall pillow
 ```
 
-#### If Installation Fails
-Try cleaning the pip cache and reinstalling:
+
+### 7. 🔧 Easy Installation Script
+To make the setup process easier, we've created an automated Python script that installs all required libraries and dependencies for Game Center. Instead of installing each package manually, simply run the script and let it handle everything for you. This ensures a smooth and hassle-free installation experience.
+👉 Just run:
 ```bash
-sudo pip3 cache purge
-sudo pip3 install pygame --force-reinstall
-sudo pip3 install customtkinter --force-reinstall
+python3 install_dependencies.py
 ```
-
-#### If Dependencies Are Missing
-Ensure all required dependencies are installed:
-```bash
-sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
-libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev \
-python3-setuptools python3-dev python3-tk -y
-```
-
----
-
-### 7. Quick Installation (All-in-One Command)
-This command installs everything in one go. However, some dependencies might be missed. If possible, copy and paste each command individually and install them one by one for better reliability.
-```bash
-sudo apt update && sudo apt upgrade -y && \
-sudo apt install python3 -y && sudo python3 -m pip install --upgrade pip && \
-sudo apt install python3-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
-libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev -y && \
-sudo pip3 install pygame --break-system-packages && \
-sudo apt install python3-tk -y && sudo pip3 install customtkinter --break-system-packages && \
-sudo apt install python3-rpi.gpio -y && sudo apt install xdotool -y && \
-sudo apt install --reinstall python3-pil python3-tk -y && \
-pip install --break-system-packages --upgrade --force-reinstall pillow && \
-sudo pip3 install socket --break-system-packages
-```
-
-### 🔹 Final Verification
-Run this command to check if all dependencies are installed successfully:
-```bash
-python3 -c "import pygame, customtkinter, RPi.GPIO, socket; print('All libraries installed successfully!')"
-```
-
