@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import time
+import time, os
 import keyboard  # To simulate keypress events
 
 from threading import Thread
@@ -53,7 +53,14 @@ def gpio_listener():
                 elif time.time() - shutdown_hold_start >= 3 and not shutdown_triggered:
                     print("Shutdown button held for 3 seconds. Shutting down...")
                     shutdown_triggered = True
-                    Thread(target=show_shutdown).start()
+                    try:
+                        Thread(target=show_shutdown).start()
+                    except Exception as e:
+                        print(f"Error starting shutdown overlay: {e}")
+                        # Create a Log File
+                        with open("shutdown_error.log", "a") as log_file:
+                            log_file.write(f"Error: {e}\n")
+                        os.system("sudo shutdown now")
             else:
                 shutdown_hold_start = None
                 shutdown_triggered = False
