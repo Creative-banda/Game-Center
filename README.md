@@ -11,8 +11,6 @@ A customizable game center built with CustomTkinter, designed to launch automati
 
 ---
 
-## Installation Guide
-
 ---
 
 ### 1. Configure Raspberry Pi OS
@@ -30,7 +28,16 @@ If the Pi isn’t booting, remove the SD card, insert it into another computer, 
 
 ---
 
-### 2. System Preparation
+## Installation Guide
+
+### 🔧 Easy Installation Script(Automated)
+To make the setup process easier, we've created an automated Python script that installs all required libraries and dependencies for Game Center. Instead of installing each package manually, simply run the script and let it handle everything for you. This ensures a smooth and hassle-free installation experience.
+(Note) : If you are using this script so you can ignore Option 2 and 3
+```bash
+python3 install_dependencies.py
+```
+
+### 2. System Preparation (Manual)
 #### Update System Packages
 Ensure your Raspberry Pi's system packages are up to date:
 ```bash
@@ -95,9 +102,38 @@ sudo apt install xdotool -y
 sudo pip3 install socket --break-system-packages
 ```
 
+### 4. Clone the GitHub Repository
+#### Install Git
+Before cloning the repository, install Git if it’s not already installed:
+```bash
+sudo apt install git -y
+```
+
+#### Why We Need Git
+Git allows us to download and manage the latest version of Game Center directly from the repository. This ensures we always have access to the newest features, bug fixes, and improvements. By using Git, we can easily update our application without manually downloading files. Additionally, our **auto-update system** relies on Git to fetch updates seamlessly.
+
+#### Clone the Repository
+To download the latest version of Game Center, clone the repository using Git:
+```bash
+git clone <REPO_URL>
+```
+Navigate into the project directory:
+```bash
+cd <REPO_FOLDER>
+```
+To pull updates in the future, run:
+```bash
+git pull
+```
+
+If you encounter permission issues while updating, try:
+```bash
+git reset --hard
+```
+
 ---
 
-### 4. Set Up Auto-Launch on Startup
+### 5. Set Up Auto-Launch on Startup
 Create a systemd service to launch Game Center automatically:
 ```bash
 sudo nano /etc/systemd/system/gamecenter.service
@@ -137,34 +173,6 @@ If you cloned the repository into a new directory, remember to update `<PATH>` i
 
 ---
 
-### 5. Clone the GitHub Repository
-#### Install Git
-Before cloning the repository, install Git if it’s not already installed:
-```bash
-sudo apt install git -y
-```
-
-#### Why We Need Git
-Git allows us to download and manage the latest version of Game Center directly from the repository. This ensures we always have access to the newest features, bug fixes, and improvements. By using Git, we can easily update our application without manually downloading files. Additionally, our **auto-update system** relies on Git to fetch updates seamlessly.
-
-#### Clone the Repository
-To download the latest version of Game Center, clone the repository using Git:
-```bash
-git clone <REPO_URL>
-```
-Navigate into the project directory:
-```bash
-cd <REPO_FOLDER>
-```
-To pull updates in the future, run:
-```bash
-git pull
-```
-
-If you encounter permission issues while updating, try:
-```bash
-git reset --hard
-```
 
 ---
 
@@ -176,10 +184,3 @@ sudo apt install --reinstall python3-pil python3-tk
 pip install --break-system-packages --upgrade --force-reinstall pillow
 ```
 
-
-### 7. 🔧 Easy Installation Script
-To make the setup process easier, we've created an automated Python script that installs all required libraries and dependencies for Game Center. Instead of installing each package manually, simply run the script and let it handle everything for you. This ensures a smooth and hassle-free installation experience.
-👉 Just run:
-```bash
-python3 install_dependencies.py
-```
