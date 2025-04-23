@@ -2,6 +2,9 @@ import RPi.GPIO as GPIO
 import time
 import keyboard  # To simulate keypress events
 
+from threading import Thread
+from show_shutdown_overlay import show_shutdown
+
 # Define GPIO pin mappings
 PIN_MAPPING = {
     6: ["w", "up"],  # LEFT_HAND_UP → W + UP
@@ -18,7 +21,7 @@ PIN_MAPPING = {
 # Define special key combinations
 KEY_COMBINATIONS = {
     (6, 12, 16): ["f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_UP  → F1
-    (6, 12, 20): ["shift", "f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_RIGHT → F1
+    (6, 12, 20): ["shift", "f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_RIGHT → Shift + F1
     (6, 12, 21): ["enter"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_DOWN → Return(Enter)
     (6, 12, 26): ["ctrl"+"f"], # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_LEFT → CTRL + F
 }
@@ -32,11 +35,28 @@ for pin in PIN_MAPPING.keys():
 pressed_keys = set()
 active_combinations = set()
 
+# Track shutdown button state
+shutdown_pin = 5
+shutdown_hold_start = None
+shutdown_triggered = False
+
 def gpio_listener():
     print("Listening for GPIO inputs... (Press Ctrl+C to stop)")
     try:
         while True:
             active_pins = {pin for pin in PIN_MAPPING.keys() if GPIO.input(pin) == GPIO.LOW}
+            
+            # Handle special shutdown logic
+            if shutdown_pin in active_pins:
+                if shutdown_hold_start is None:
+                    shutdown_hold_start = time.time()
+                elif time.time() - shutdown_hold_start >= 3 and not shutdown_triggered:
+                    print("Shutdown button held for 3 seconds. Shutting down...")
+                    shutdown_triggered = True
+                    Thread(target=show_shutdown).start()
+            else:
+                shutdown_hold_start = None
+                shutdown_triggered = False
 
             # Handle combinations first
             handled_combinations = False  
