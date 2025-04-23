@@ -68,6 +68,11 @@ def verify_installation():
         print(e)
         sys.exit(1)
 
+def trouble_shooting():
+    run_command("sudo apt install --reinstall python3-pil python3-tk")
+    run_command("pip install --break-system-packages --upgrade --force-reinstall pillow")
+
+
 # Main installation function
 def main():
     print("Starting installation script...")
@@ -75,6 +80,7 @@ def main():
     update_system()
     install_python_pip()
     install_libraries()
+    trouble_shooting()
     verify_installation()
 
     print("Installation completed successfully! Now, please configure the gamecenter.service manually.")
