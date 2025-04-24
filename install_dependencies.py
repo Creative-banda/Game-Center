@@ -58,7 +58,6 @@ def install_libraries():
         "libjpeg-dev",
         "python3-rpi.gpio",
         "xdotool",
-        "git",
         "mgba-qt"
     ]
 
