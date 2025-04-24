@@ -8,7 +8,7 @@ import socket, pathlib
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -47,92 +47,174 @@ class GameApp(ctk.CTk):
         self.update_idletasks()
         
     def show_splash_screen(self):
+        # Create a stylish black frame
         self.splash_frame = ctk.CTkFrame(self, fg_color="#000000")
-        self.splash_frame.place(relx=0.5, rely=0.5, anchor="center")
+        self.splash_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
         
-        image_size = min(self.screen_width, self.screen_height) * 0.5
+        # Create a center content container
+        self.splash_content = ctk.CTkFrame(self.splash_frame, fg_color="#000000")
+        self.splash_content.place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Stylish logo
+        image_size = min(self.screen_width, self.screen_height) * 0.4
         self.logo_image = ctk.CTkImage(
             dark_image=Image.open(f"{current_path}/logo.png"),
             size=(image_size, image_size)
         )
         
-        self.splash_label = ctk.CTkLabel(self.splash_frame, text="", image=self.logo_image)
+        # Add logo with gaming style
+        self.splash_label = ctk.CTkLabel(self.splash_content, text="", image=self.logo_image)
         self.splash_label.pack(pady=20)
         
+        # Add a title with gaming font
+        self.title_label = ctk.CTkLabel(
+            self.splash_content, 
+            text="GAME CENTER", 
+            font=("Orbitron", 32, "bold"), 
+            text_color="#00CCFF"
+        )
+        self.title_label.pack(pady=(5, 25))
+        
+        # Create a progress bar for visual feedback
+        self.progress_bar = ctk.CTkProgressBar(
+            self.splash_content, 
+            width=350, 
+            height=12, 
+            corner_radius=0,
+            progress_color="#00CCFF", 
+            fg_color="#111111"
+        )
+        self.progress_bar.set(0)
+        self.progress_bar.pack(pady=(0, 15))
+        
+        # Status text with futuristic font
         self.status_label = ctk.CTkLabel(
-            self.splash_frame, text="Checking for updates...", font=("Roboto", 18), text_color="white"
+            self.splash_content, 
+            text="INITIALIZING SYSTEM", 
+            font=("Orbitron", 16), 
+            text_color="#FFFFFF"
         )
         self.status_label.pack()
         
-        self.fade_in()
+        # Version info at the bottom corner
+        self.version_label = ctk.CTkLabel(
+            self.splash_frame, 
+            text="v1.0.0", 
+            font=("Orbitron", 12), 
+            text_color="#555555"
+        )
+        self.version_label.place(relx=0.98, rely=0.98, anchor="se")
         
+        # Start the fade-in animation
+        self.fade_in()
+
     def fade_in(self):
+        # Start with black screen
+        self.attributes('-alpha', 0)
+        
+        # Fade in effect
         for i in range(0, 101, 2):
             self.attributes('-alpha', i/100)
             self.update()
             time.sleep(0.01)
         
+        # Start the update process in a separate thread
+        self.progress_bar.set(0.2)  # Initial progress
         threading.Thread(target=self.check_for_updates, daemon=True).start()
-    
+
     def check_for_updates(self):
-        self.status_label.configure(text="Checking internet connection...")
-        have_internet = self.check_internet()
+        # Step 1: Check internet
+        self.status_label.configure(text="CHECKING CONNECTION")
+        self.progress_bar.set(0.3)
+        time.sleep(0.5)  # Small delay for visual effect
         
+        have_internet = self.check_internet()
+        self.progress_bar.set(0.5)
+        
+        # Step 2: Update based on connection
         if have_internet:
-            self.status_label.configure(text="Updating console...")
+            self.status_label.configure(text="UPDATING SYSTEM")
+            self.progress_bar.set(0.7)
             self.update_repo()
         else:
-            self.status_label.configure(text="No internet connection.")
+            self.status_label.configure(text="OFFLINE MODE")
+            self.progress_bar.set(0.9)
         
-        time.sleep(2)
+        # Final progress
+        self.progress_bar.set(1.0)
         
-        self.fade_out()
-    
+        # Flash the progress bar to indicate completion
+        self.flash_progress_bar()
+        
+        # Wait 2 seconds before fading out
+        self.status_label.after(2000, self.fade_out)
+
+    def flash_progress_bar(self):
+        """Add a flashing effect to the progress bar on completion"""
+        original_color = self.progress_bar.cget("progress_color")
+        
+        def flash_once():
+            self.progress_bar.configure(progress_color="#FFFFFF")
+            self.after(100, lambda: self.progress_bar.configure(progress_color=original_color))
+        
+        flash_once()
+        self.after(300, flash_once)  # Flash twice
+
     def fade_out(self):
+        # Fade out with a slight delay
+        self.status_label.configure(text="LAUNCHING")
+        
         for i in range(100, -1, -2):
             self.attributes('-alpha', i/100)
             self.update()
             time.sleep(0.01)
-        self.transition_to_main_ui()
         
+        # Transition to main UI
+        self.transition_to_main_ui()
+
     def check_internet(self, host="8.8.8.8", port=53, timeout=3):
         """Check if there is an active internet connection."""
         try:
             socket.setdefaulttimeout(timeout)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((host, port))
-            sock.close()  # Properly close the socket
-            self.status_label.configure(text="Connected to the internet.")
+            sock.close()
+            self.status_label.configure(text="CONNECTION ESTABLISHED")
             return True
         except socket.error:
+            self.status_label.configure(text="OFFLINE MODE")
             print("No internet connection.")
-            return False        
+            return False
 
     def update_repo(self):
         """Pull the latest changes from the GitHub repository and restart if necessary."""
         try:
             result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
             
-            self.status_label.configure(text="Checking for updates...")
-
             if "Already up to date." in result.stdout:
-                self.status_label.configure(text="No updates available.")
+                self.status_label.configure(text="SYSTEM UP TO DATE")
             else:
-                self.status_label.configure(text="Update successful. Restarting...")
+                self.status_label.configure(text="UPDATE COMPLETE - RESTARTING")
                 time.sleep(2)
                 # Close the current application, startup script will run the new version
-                self.quit()  
-
+                self.quit()
 
         except Exception as e:
+            self.status_label.configure(text="UPDATE ERROR")
             print("Error updating repository:", str(e))
 
     def transition_to_main_ui(self):
+        # Clean up splash screen
         self.splash_frame.destroy()
+        
+        # Initialize main UI
         self.setup_main_ui()
+        
+        # Fade in main UI
         self.fade_in_main()
-    
+
     def fade_in_main(self):
+        # Fade in main UI
         for i in range(0, 101, 2):
             self.attributes('-alpha', i/100)
             self.update()
@@ -211,7 +293,7 @@ class GameApp(ctk.CTk):
             self.desc_frame,
             text="",
             wraplength=int(self.screen_width * 0.5),
-            font=("Roboto", 16),
+            font=("Orbitron", 16),
             text_color="#FFFFFF"
         )
         self.desc_label.place(relx=0.5, rely=0.5, anchor="center")
@@ -238,6 +320,7 @@ class GameApp(ctk.CTk):
             if i == self.selected_index:
                 button.set_selected(True)
 
+                # Load and display game image
                 image_path = f"{current_path}/games/games_images/{button.cget('text')}.jpg"
                 image_width = int(self.screen_width * 0.5)
                 image_height = int(self.screen_height * 0.4)
@@ -247,23 +330,32 @@ class GameApp(ctk.CTk):
                     args=(image_path, image_width, image_height),
                     daemon=True
                 ).start()
+
+                # Load and display game description
                 text = self.read_txt(button.cget('text'))
                 self.desc_label.configure(
                     text=f"{button.cget('text')}\n"
-                         f"{text}"
+                        f"{text}"
                 )
 
+                # Calculate scroll position to center the selected item
                 button.update_idletasks()
-                button_y = button.winfo_y()
                 scroll_frame_height = self.scroll_frame.winfo_height()
                 button_height = button.winfo_height()
-
-                total_content_height = len(self.items) * button_height
-                visible_fraction = scroll_frame_height / total_content_height
-                scroll_fraction = button_y / (total_content_height - scroll_frame_height)
-
-                scroll_fraction = max(0, min(scroll_fraction, 1 - visible_fraction))
+                button_y = button.winfo_y()
+                
+                # Calculate the center position of the button
+                button_center = button_y + button_height / 2
+                
+                # Calculate the desired scroll position to center the button
+                scroll_fraction = (button_center - scroll_frame_height / 2) / (len(self.items) * button_height)
+                
+                # Ensure scroll fraction stays within bounds (0-1)
+                scroll_fraction = max(0, min(scroll_fraction, 1))
+                
+                # Apply the scroll
                 self.scroll_frame._parent_canvas.yview_moveto(scroll_fraction)
+                
             else:
                 button.set_selected(False)
 
@@ -329,8 +421,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
@@ -339,31 +431,34 @@ class GameApp(ctk.CTk):
         self.quit()
 
 class GameButton(ctk.CTkButton):
-    def _init_(self, *args, **kwargs):
-        super()._init_(*args, **kwargs)
+    def __init__(self, *args, **kwargs): 
+        super().__init__(*args, **kwargs)
         self.configure(
-            corner_radius=10,
-            fg_color="#2B2B2B",
-            hover_color="#3B3B3B",
-            text_color="#FFFFFF",
-            font=("Roboto", 16),
+            corner_radius=12,
+            fg_color="#202020",  # Deep matte black
+            hover_color="#2D2D2D",  # Softer contrast
+            text_color="#EDEDED",  # Softer white
+            font=("Orbitron", 17),  # Sleek & modern font
             border_width=2,
-            border_color="#1A1A1A"
+            border_color="#333333"
         )
 
     def set_selected(self, selected):
         if selected:
             self.configure(
-                fg_color="#1A84D6",
-                border_color="#0A5AAD",
-                hover_color="#1976C2"
+                fg_color="#0D6EFD",  # Vibrant blue
+                border_color="#0A58CA",
+                hover_color="#1A74E9",
+                text_color="#FFFFFF"  # Brighter text for contrast
             )
         else:
             self.configure(
-                fg_color="#2B2B2B",
-                border_color="#1A1A1A",
-                hover_color="#3B3B3B"
+                fg_color="#202020",
+                border_color="#333333",
+                hover_color="#2D2D2D",
+                text_color="#EDEDED"
             )
+
 
 # Run the Application
 if __name__ == "__main__":
