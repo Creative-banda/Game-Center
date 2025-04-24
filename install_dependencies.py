@@ -3,6 +3,8 @@
 import subprocess
 import sys
 from time import sleep
+from pathlib import Path
+import getpass
 
 
 user = ""
@@ -10,15 +12,11 @@ path = ""
 
 def setup_user_and_path():
     global user, path
-    print("🔧 Let's configure Game Center on your Raspberry Pi")
-    print("\n👉 Enter your Raspberry Pi username.")
-    print("   (This is usually 'pi' unless you've set a custom user)")
-    user = input("Username: ").strip()
-
-    print("\n👉 Enter the full path to the Game Center folder.")
-    print("You can find the path where you clone the repo.")
-    print("     Example: /home/pi/GameCenter")
-    path = input("Full path: ").strip()
+    print("🔧 Configuring Game Center on your Raspberry Pi...")
+    user = getpass.getuser()  # Get the current username
+    path = str(Path(__file__).resolve().parent)  # Get the current script's directory
+    print(f"Detected username: {user}")
+    print(f"Detected path: {path}")
 
 # Function to execute commands and check for success
 def run_command(command):
@@ -126,6 +124,18 @@ def create_service():
         print(f"   🔍 Error: {e}")  
         print("   🛠️  Double-check the service file and try again.")  
 
+
+def install_font():
+    print("Installing custom font...")
+    try:
+        run_command("sudo mkdir -p /usr/share/fonts/truetype/orbitron")
+        run_command(f"sudo cp {path}/fonts/Orbitron.ttf /usr/share/fonts/truetype/orbitron/")
+        run_command("sudo fc-cache -f -v")
+    except Exception as e:
+        print(f"\n❌ Oops! Font installation failed: {e}")  
+        print("   🛠️  Double-check the font path and try again.")  
+    print("Font installation complete! 🎨")
+
 # Verifying installation
 def verify_installation():
     print("🔍 Checking if all libraries are installed...")  
@@ -156,6 +166,7 @@ def main():
     trouble_shooting()
     create_service()
     verify_installation()
+    install_font()
     reboot_system()
 
     print("\n🎉 Game Center is all set up and ready to rock! 🎮")  
