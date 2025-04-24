@@ -95,17 +95,18 @@ class GameApp(ctk.CTk):
             time.sleep(0.01)
         self.transition_to_main_ui()
         
-    def check_internet(self,host="8.8.8.8", port=53, timeout=3):
+    def check_internet(self, host="8.8.8.8", port=53, timeout=3):
         """Check if there is an active internet connection."""
         try:
             socket.setdefaulttimeout(timeout)
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((host, port))
+            sock.close()  # Properly close the socket
             self.status_label.configure(text="Connected to the internet.")
             return True
         except socket.error:
             print("No internet connection.")
-            return False
-        
+            return False        
 
     def update_repo(self):
         """Pull the latest changes from the GitHub repository and restart if necessary."""
@@ -126,7 +127,6 @@ class GameApp(ctk.CTk):
         except Exception as e:
             print("Error updating repository:", str(e))
 
-
     def transition_to_main_ui(self):
         self.splash_frame.destroy()
         self.setup_main_ui()
@@ -138,7 +138,6 @@ class GameApp(ctk.CTk):
             self.update()
             time.sleep(0.01)
     
-
     def setup_main_ui(self):
         self.title("Game Info App")
 
@@ -227,9 +226,6 @@ class GameApp(ctk.CTk):
         self.bind("<KeyPress-space>", self.select_item)
         self.bind("<KeyPress-Escape>", self.close_window)
     
-    
-    # Function to Read and return the txt file
-    
     def read_txt(self, game_name):
         try:
             with open(f"{current_path}/games/games_texts/{game_name}.txt", 'r') as file:
@@ -237,7 +233,6 @@ class GameApp(ctk.CTk):
         except FileNotFoundError:
             return "No Description"
         
-    
     def update_selection(self):
         for i, button in enumerate(self.items):
             if i == self.selected_index:
@@ -272,7 +267,6 @@ class GameApp(ctk.CTk):
             else:
                 button.set_selected(False)
 
-    # Rest of the methods remain the same
     def fade_image(self, new_image_path, target_width, target_height):
         try:
             steps = 10
@@ -306,7 +300,6 @@ class GameApp(ctk.CTk):
             self.selected_index += 1
             self.update_selection()
 
-    # Function to handle game selection
     def select_item(self, event):
         if time.time() - self.last_select_item > 0.5:
             selected_item = self.items[self.selected_index]
