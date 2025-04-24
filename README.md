@@ -108,15 +108,20 @@ libjpeg-dev -y
 ```
 
 #### Install GPIO Library
+
+`python3-rpi.gpio` allows Game Center to read input from physical buttons connected to the Raspberry Pi's GPIO pins.
+
 ```bash
 sudo apt install python3-rpi.gpio -y
 ```
 
 #### Install Keyboard Library
+The `keyboard `  library is used to emulate key presses based on GPIO input, letting physical buttons control games as if you're using a keyboard.
 ```bash
 sudo pip3 install keyboard --break-system-packages
 ```
 #### Install mGBA-Qt Emulator (Game Boy Advance for External Games)
+`mgba-qt` is a lightweight emulator used in Game Center to run external Game Boy Advance (GBA) games seamlessly within the console.
 ```bash
 sudo apt install mgba-qt
 ```
@@ -125,11 +130,6 @@ sudo apt install mgba-qt
 `xdotool` is used to simulate key presses or mouse clicks. In Game Center, it ensures that the application window gains focus automatically upon startup.
 ```bash
 sudo apt install xdotool -y
-```
-
-#### Install Socket Library
-```bash
-sudo pip3 install socket --break-system-packages
 ```
 
 ---
