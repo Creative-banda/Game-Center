@@ -115,12 +115,12 @@ class Player(pygame.sprite.Sprite):
             # play a random jump sound
             sound = random.choice(jump_sounds)
             if sound == "jump":
-                jump = pygame.mixer.Sound(f"assets/sfx/{sound}.mp3")
+                jump = pygame.mixer.Sound(f"{CURRENT_PATH}/assets/sfx/{sound}.mp3")
                 # reduce the volume of the jump sound
                 jump.set_volume(0.5)
                 jump.play()
             else:
-                pygame.mixer.Sound(f"assets/sfx/{sound}.mp3").play()
+                pygame.mixer.Sound(f"{CURRENT_PATH}/assets/sfx/{sound}.mp3").play()
 
 
         # Allow horizontal movement even while in the air

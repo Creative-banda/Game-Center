@@ -1,5 +1,5 @@
 import pygame, random
-from extra.Gangster_settings import PLAYER_SIZE, CELL_SIZE, ENEMIES, scale_x, scale_y
+from extra.Gangster_settings import PLAYER_SIZE, CELL_SIZE, ENEMIES, scale_x, scale_y, CURRENT_PATH
 from extra.Gangster_player import Bullet, bullet_group
 
 
@@ -102,7 +102,7 @@ class Enemy(pygame.sprite.Sprite):
             self.isHurt = False
             self.update_animation("Dead")
             sound = random.randint(0,3)
-            pygame.mixer.Sound(f"assets/sfx/enemy_die/{sound}.mp3").play()
+            pygame.mixer.Sound(f"{CURRENT_PATH}/assets/sfx/enemy_die/{sound}.mp3").play()
                 
 
     def shoot(self):
@@ -116,7 +116,7 @@ class Enemy(pygame.sprite.Sprite):
                              self.rect.centery-10, self.direction, self.bullet_damage, self.zoom_value)
             bullet_group.add(bullet)
             self.last_bullet_time = pygame.time.get_ticks()
-            pygame.mixer.Sound("assets/sfx/pistol.mp3").play()
+            pygame.mixer.Sound(f"{CURRENT_PATH}/assets/sfx/pistol.mp3").play()
    
 
     def load_animations(self):

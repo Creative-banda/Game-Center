@@ -70,7 +70,7 @@ class Acid(pygame.sprite.Sprite):
         
         self.last_update_time = pygame.time.get_ticks()
         for i in range(4):
-            self.image = pygame.image.load(f"assets/image/new_map/acid-{i}.png")
+            self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/new_map/acid-{i}.png")
             self.image = pygame.transform.scale(self.image, (CELL_SIZE * ZOOM_VALUE, (CELL_SIZE + (10 * scale_y)) * ZOOM_VALUE))
             self.images.append(self.image)
         self.image = self.images[self.frame_index]
@@ -125,7 +125,7 @@ class Exit(pygame.sprite.Sprite):
         self.animation_cooldown = 200
         self.animation_complete = False
         for i in range(6):
-            self.image = pygame.image.load(f"assets/image/new_map/exit-{i}.png")
+            self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/new_map/exit-{i}.png")
             self.image = pygame.transform.scale(self.image, (CELL_SIZE // 2 * ZOOM_VALUE, CELL_SIZE * ZOOM_VALUE))
             self.images.append(self.image)
         
@@ -172,7 +172,7 @@ class Exit(pygame.sprite.Sprite):
 class Ground(pygame.sprite.Sprite):
     def __init__(self, x, y, image):
         super().__init__()
-        self.image = pygame.image.load(f"assets/image/new_map/Tile_{image}.png")
+        self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/new_map/Tile_{image}.png")
         self.image = pygame.transform.scale(self.image, (CELL_SIZE * ZOOM_VALUE, CELL_SIZE * ZOOM_VALUE))
         self.rect = self.image.get_rect()
         self.x = x
@@ -191,7 +191,7 @@ class Ground(pygame.sprite.Sprite):
 class Grass(pygame.sprite.Sprite):
     def __init__(self, x, y, image):
         super().__init__()
-        self.image = pygame.image.load(f"assets/image/new_map/Tile_{image}.png")
+        self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/new_map/Tile_{image}.png")
         self.image = pygame.transform.scale(self.image, (CELL_SIZE // 2 * ZOOM_VALUE, CELL_SIZE // 2 * ZOOM_VALUE))
         self.rect = self.image.get_rect()
         self.x = x + (CELL_SIZE // 2 ) * ZOOM_VALUE
@@ -220,7 +220,7 @@ class CollectItem(pygame.sprite.Sprite):
         self.images = []
         
         for i in range(self.max_frame_index):
-            self.image = pygame.image.load(f"assets/image/collect_item/{self.type}/{self.type}-{i}.png")
+            self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/collect_item/{self.type}/{self.type}-{i}.png")
             if self.type == "smg" or self.type == "laser":
                 self.image = pygame.transform.scale(self.image, ((CELL_SIZE + (30 * scale_x)) * ZOOM_VALUE , (CELL_SIZE + (30 * scale_y))  * ZOOM_VALUE))        
             else:
@@ -270,14 +270,14 @@ class CollectItem(pygame.sprite.Sprite):
             health_pickup_sound.play()
             show_achievement("New Weapon Laser Unlocked")
             self.kill()
-        
-           
+
+
 class Ammo(pygame.sprite.Sprite):
     def __init__(self, x, y, gunammo):
         super().__init__()
         self.frame_index = 0
         self.gunammo = gunammo
-        self.image = pygame.image.load(f"assets/image/collect_item/ammo/{self.gunammo}_{self.frame_index}.png")
+        self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/collect_item/ammo/{self.gunammo}_{self.frame_index}.png")
         self.image = pygame.transform.scale(self.image, (30 * ZOOM_VALUE * scale_x,30 * ZOOM_VALUE * scale_y))
         self.rect = self.image.get_rect()
         self.x = x
@@ -301,7 +301,7 @@ class Ammo(pygame.sprite.Sprite):
         if self.frame_index >= 4:
             self.frame_index = 0
         
-        self.image = pygame.image.load(f"assets/image/collect_item/ammo/{self.gunammo}_{self.frame_index}.png")
+        self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/collect_item/ammo/{self.gunammo}_{self.frame_index}.png")
         self.image = pygame.transform.scale(self.image, (30 * ZOOM_VALUE * scale_x,30 * ZOOM_VALUE * scale_y))
     
     
@@ -319,7 +319,7 @@ class Ammo(pygame.sprite.Sprite):
 class Jumper(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("assets/image/new_map/jumper.png")
+        self.image = jumper_image
         self.image = pygame.transform.scale(self.image, (20 * ZOOM_VALUE * scale_y, 20 * ZOOM_VALUE * scale_x))
         self.rect = self.image.get_rect()
         self.x = x
@@ -348,7 +348,7 @@ class Plane(pygame.sprite.Sprite):
     def __init__(self, x, y, type):
         super().__init__()
         self.type = type
-        self.image = pygame.image.load(f"assets/image/background/{self.type}_plane.png")
+        self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/background/{self.type}_plane.png")
         self.image = pygame.transform.scale(self.image, (80 * ZOOM_VALUE * scale_x, 50 * ZOOM_VALUE * scale_y))
         self.rect = self.image.get_rect()
         self.x = x
@@ -483,7 +483,7 @@ class Explosion(pygame.sprite.Sprite):
         self.damage_given = False
         self.images = []
         for i in range(0,15):
-            self.image = pygame.image.load(f"assets/image/explosion/explosion-{i}.png")
+            self.image = pygame.image.load(f"{CURRENT_PATH}/assets/image/explosion/explosion-{i}.png")
             self.image = pygame.transform.scale(self.image, (CELL_SIZE * 2 * ZOOM_VALUE , CELL_SIZE * 2 * ZOOM_VALUE ))
             self.images.append(self.image)
         self.image = self.images[self.frame_index]
@@ -538,7 +538,7 @@ def create_map():
     reset_sprites()
     
     # Load the level 1 as json file 
-    with open(f"assets/level_{current_level}.json") as file:
+    with open(f"{CURRENT_PATH}/assets/level_{current_level}.json") as file:
         maze_layout = json.load(file)
     
     if current_level == 4:
@@ -648,8 +648,8 @@ def draw_achievement():
 def show_Intro():
     running = True
 
-    video_path = "assets/intro_1.mp4"
-    audio_path = "assets/intro.ogg"
+    video_path = f"{CURRENT_PATH}/assets/intro_1.mp4"
+    audio_path = f"{CURRENT_PATH}/assets/intro.ogg"
     video = cv2.VideoCapture(video_path)
 
     fps = video.get(cv2.CAP_PROP_FPS)
@@ -955,7 +955,7 @@ def main():
         ("Player", "Tell them I'll come for them"),
     ]
 
-    
+
     DisplayLevel()
     # play background music
     bg_music.play(-1)
