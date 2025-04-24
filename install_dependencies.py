@@ -4,6 +4,22 @@ import subprocess
 import sys
 from time import sleep
 
+
+user = ""
+path = ""
+
+def setup_user_and_path():
+    global user, path
+    print("🔧 Let's configure Game Center on your Raspberry Pi")
+    print("\n👉 Enter your Raspberry Pi username.")
+    print("   (This is usually 'pi' unless you've set a custom user)")
+    user = input("Username: ").strip()
+
+    print("\n👉 Enter the full path to the Game Center folder.")
+    print("You can find the path where you clone the repo.")
+    print("     Example: /home/pi/GameCenter")
+    path = input("Full path: ").strip()
+
 # Function to execute commands and check for success
 def run_command(command):
     try:
@@ -13,7 +29,6 @@ def run_command(command):
         print(f"Error occurred while executing: {command}")
         print(e)
         sys.exit(1)
-
 
 # Updating system packages
 def update_system():
@@ -59,18 +74,25 @@ def install_libraries():
     for package in pip_packages:
         run_command(f"sudo pip3 install {package} --break-system-packages")
 
-
+# Troubleshooting PIL issues    
+def trouble_shooting():
+    print("Checking and fixing PIL issues if any...")
+    try:
+        run_command("sudo apt install --reinstall python3-pil python3-tk")
+        run_command("pip install --break-system-packages --upgrade --force-reinstall pillow")
+    except Exception as e:
+        print(f"\n⚠️  Uh-oh! Troubleshooting failed: {e}")  
+        print("   🛠️  Try these commands to fix things:")  
+        print("""   
+            📝 Run these one by one:  
+            sudo apt install --reinstall python3-pil python3-tk  
+            pip install --break-system-packages --upgrade --force-reinstall pillow  
+            """)  
+        print("   🔧 If the issue persists, check the troubleshooting guide.")
+           
 # Create Service
-
 def create_service():
-    print("🔧 Let's set up Game Center to auto-launch on startup.")
-    print("\n👉 Enter your Raspberry Pi username.")
-    print("   (This is usually 'pi' unless you've set a custom user)")
-    user = input("Username: ").strip()
-
-    print("\n👉 Enter the full path to the Game Center folder.")
-    print("You can find the path where you clone the repo. Example: /home/pi/GameCenter")
-    path = input("Full path: ").strip()
+    global user, path
 
     service_content = f"""[Unit]
     Description=Game Center GUI Application
@@ -105,8 +127,6 @@ def create_service():
         print(f"   🔍 Error: {e}")  
         print("   🛠️  Double-check the service file and try again.")  
 
-
-
 # Verifying installation
 def verify_installation():
     print("🔍 Checking if all libraries are installed...")  
@@ -119,24 +139,9 @@ def verify_installation():
         print("   🛠️  Re-run the installer or check the setup guide.")  
         sys.exit(1)  
         
-# Troubleshooting PIL issues    
-def trouble_shooting():
-    print("Checking and fixing PIL issues if any...")
-    try:
-        run_command("sudo apt install --reinstall python3-pil python3-tk")
-        run_command("pip install --break-system-packages --upgrade --force-reinstall pillow")
-    except Exception as e:
-        print(f"\n⚠️  Uh-oh! Troubleshooting failed: {e}")  
-        print("   🛠️  Try these commands to fix things:")  
-        print("""   
-            📝 Run these one by one:  
-            sudo apt install --reinstall python3-pil python3-tk  
-            pip install --break-system-packages --upgrade --force-reinstall pillow  
-            """)  
-
 def reboot_system():  
-    confirm = input("\n🔁 Reboot now to apply changes? (y/n): ").strip().lower()  
-    if confirm == "y":  
+    confirm = input("\n🔁 Reboot now to apply changes? Press y to reboot ").strip().lower()  
+    if confirm == "y" or confirm == "Y":  
         print("\n🔄 Rebooting now... See you in a sec! ⚡")  
         sleep(1)
         subprocess.run(["sudo", "reboot"])  
@@ -145,8 +150,7 @@ def reboot_system():
 
 # Main installation function
 def main():
-    print("Starting installation script...")
-
+    setup_user_and_path()
     update_system()
     install_python_pip()
     install_libraries()
