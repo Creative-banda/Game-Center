@@ -6,51 +6,71 @@ def show_shutdown():
     root.title("Shutting Down")
     root.overrideredirect(True)
     root.wm_attributes("-topmost", True)
-    root.wm_attributes("-transparentcolor", "#123456")
+    root.wm_attributes("-transparentcolor", "#101010")
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     root.geometry(f"{screen_width}x{screen_height}+0+0")
-    root.configure(bg="#123456")
+    root.configure(bg="#101010")
 
-    # Base font settings
-    font_main = ("Segoe UI", 40, "bold")
-    font_sub = ("Segoe UI", 14, "italic")
+    # --- Fonts ---
+    # Use a retro/gaming font like 'Press Start 2P' or 'VT323' if installed
+    font_main = ("Courier New", 32, "bold")  # Placeholder: You can replace this with a cool pixel font
+    font_sub = ("Courier New", 14, "normal")
 
-    # Main label
+    # --- Center Icon (text-based emoji style) ---
+    icon_label = tk.Label(
+        root,
+        text="🕹️",
+        font=("Arial", 60),
+        fg="#00ffcc",
+        bg="#101010"
+    )
+    icon_label.place(relx=0.5, rely=0.35, anchor="center")
+
+    # --- Main Shutdown Text ---
     label = tk.Label(
         root,
-        text="⚠️ Shutting Down...",
+        text="Powering Off...",
         font=font_main,
-        fg="white",
-        bg="#123456"
+        fg="#00ffcc",
+        bg="#101010"
     )
-    label.place(relx=0.5, rely=0.45, anchor="center")
+    label.place(relx=0.5, rely=0.48, anchor="center")
 
-    # Sub label with glow hint
+    # --- Subtext with pixel style ---
     sub_label = tk.Label(
         root,
-        text="Please wait...",
+        text="Please wait while your console shuts down.",
         font=font_sub,
-        fg="#aaa",
-        bg="#123456"
+        fg="#888888",
+        bg="#101010"
     )
-    sub_label.place(relx=0.5, rely=0.55, anchor="center")
+    sub_label.place(relx=0.5, rely=0.56, anchor="center")
 
-    # Animate glow effect
-    def pulse(count=0):
-        # Change color intensity every few ticks to simulate glowing
-        glow_colors = ["#ffffff", "#dddddd", "#bbbbbb", "#dddddd"]
-        label.config(fg=glow_colors[count % len(glow_colors)])
-        root.after(200, lambda: pulse(count + 1))
+    # --- Pixel-style loading dots ---
+    loading_dots = tk.Label(
+        root,
+        text=".",
+        font=font_main,
+        fg="#00ffcc",
+        bg="#101010"
+    )
+    loading_dots.place(relx=0.5, rely=0.63, anchor="center")
 
-    pulse()  # Start animation
+    def animate_dots(count=0):
+        dots = "." * ((count % 3) + 1)
+        loading_dots.config(text=dots)
+        root.after(300, lambda: animate_dots(count + 1))
 
-    # After 1.5 seconds → Shutdown
+    animate_dots()
+
+    # --- Shutdown command after delay ---
     def delayed_shutdown():
         root.destroy()
         os.system("sudo shutdown now")
 
-    root.after(1500, delayed_shutdown)
+    root.after(2500, delayed_shutdown)
     root.mainloop()
 
+show_shutdown()
