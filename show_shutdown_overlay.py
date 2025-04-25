@@ -72,5 +72,4 @@ def show_shutdown():
 
     root.after(2500, delayed_shutdown)
     root.mainloop()
-
-show_shutdown()
+    root.destroy()
