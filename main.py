@@ -4,11 +4,12 @@ import os, subprocess
 import time
 import threading
 import socket, pathlib
+from itertools import cycle
 
 
 current_path = pathlib.Path(__file__).parent.resolve()
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -26,10 +27,10 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        self.after(500,self.set_focus)
+        # self.after(500,self.set_focus)
         
         self.update_idletasks()
-        self.set_focus()
+        # self.set_focus()
                
         self.last_closing_attempt = time.time()
 
@@ -221,34 +222,66 @@ class GameApp(ctk.CTk):
             time.sleep(0.01)
     
     def setup_main_ui(self):
-        self.title("Game Info App")
+        # Theme colors
+        dark_bg = "#121212"
+        panel_bg = "#1A1A1A"
+        accent_color = "#FF5722"  # Vibrant orange accent
+        secondary_accent = "#8C52FF"  # Purple secondary accent
+        highlight_color = "#2196F3"  # Blue highlight
+        text_primary = "#FFFFFF"
+        text_secondary = "#AAAAAA"
 
-
-        # Main Container
-        self.main_container = ctk.CTkFrame(self, fg_color="#1E1E1E", corner_radius=0)
+        # Main Container with dark gaming background
+        self.main_container = ctk.CTkFrame(self, fg_color=dark_bg, corner_radius=0)
         self.main_container.pack(fill="both", expand=True)
-
-        # Content Frame
-        self.content_frame = ctk.CTkFrame(self.main_container, fg_color="#2D2D2D", corner_radius=15)
-        self.content_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.9, relheight=0.9)
-
-        # Footer
-        self.footer_label = ctk.CTkLabel(
-            self.main_container,
-            text="Created with ❤ by Orchids powered by STEM",
-            font=("Orbitron", 20, "bold"),
-            text_color="#888888"
+        
+        # Header frame - set height in constructor
+        self.header_frame = ctk.CTkFrame(self.main_container, fg_color=panel_bg, height=60, corner_radius=0)
+        self.header_frame.pack(fill="x", pady=(0, 15))
+        
+        # Create glossy logo effect
+        logo_text = "ORCHIDS GAME HUB"
+        self.logo_label = ctk.CTkLabel(
+            self.header_frame,
+            text=logo_text,
+            font=("Orbitron", 28, "bold"),
+            text_color=accent_color
         )
-        self.footer_label.place(relx=0.5, rely=0.98, anchor="center")
+        self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
+        
 
-        # Scrollable Game List
+        # Content Frame - Main area with rounded corners
+        self.content_frame = ctk.CTkFrame(
+            self.main_container, 
+            fg_color=panel_bg, 
+            corner_radius=20,
+            border_width=2,
+            border_color=accent_color
+        )
+        self.content_frame.place(relx=0.5, rely=0.52, anchor="center", relwidth=0.95, relheight=0.82)
+        
+
+
+        # Scrollable Game List with title
+        self.games_title = ctk.CTkLabel(
+            self.content_frame,
+            text="GAME LIBRARY",
+            font=("Orbitron", 16, "bold"),
+            text_color=accent_color
+        )
+        self.games_title.place(relx=0.02, rely=0.04)
+        
+
+        # Improved scrollable game list
         self.scroll_frame = ctk.CTkScrollableFrame(
             self.content_frame,
-            fg_color="#202020",
+            fg_color="#151515",
             corner_radius=15,
-            width=int(self.screen_width * 0.25)
+            width=int(self.screen_width * 0.25),
+            border_width=1,
+            border_color="#333333"
         )
-        self.scroll_frame.place(relx=0.02, rely=0.5, anchor="w", relwidth=0.28, relheight=0.95)
+        self.scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.83)
 
         # Game Buttons
         self.items = []
@@ -258,7 +291,7 @@ class GameApp(ctk.CTk):
         game_folder = f"{current_path}/games"
         files = os.listdir(game_folder)
         for file in files:
-            if file.endswith(".py") or  file.endswith(".zip"):
+            if file.endswith(".py") or file.endswith(".zip"):
                 all_games.append(file)
 
         for file in all_games:
@@ -270,33 +303,112 @@ class GameApp(ctk.CTk):
                 name = file.split(".")[0]
                 self.games_dict[name] = {"path": f"{game_folder}/{file}", "type": "emulator"}
 
-
-            # Create buttons for all detected games
-            button = GameButton(self.scroll_frame, text=name, height=int(self.screen_height * 0.05))
-            button.pack(pady=5, padx=10, fill="x")
+            # Create buttons for all detected games with enhanced styling
+            button = GameButton(
+                self.scroll_frame, 
+                text=name, 
+                height=int(self.screen_height * 0.07),
+                fg_color="#252525",
+                hover_color="#303030",
+                corner_radius=10
+            )
+            button.pack(pady=5, padx=8, fill="x")
             self.items.append(button)
 
-        # Right Content Area
+        # Right Content Area - Game details
         self.right_content = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        self.right_content.place(relx=0.35, rely=0.02, relwidth=0.63, relheight=0.95)
+        self.right_content.place(relx=0.33, rely=0.02, relwidth=0.65, relheight=0.96)
 
-        # Image Display
-        self.image_frame = ctk.CTkFrame(self.right_content, fg_color="#202020", corner_radius=15)
-        self.image_frame.place(relx=0, rely=0, relwidth=1, relheight=0.7)
+        # Game image display with glow effect border
+        self.image_frame = ctk.CTkFrame(
+            self.right_content, 
+            fg_color="#151515", 
+            corner_radius=15,
+            border_width=2,
+            border_color=secondary_accent
+        )
+        self.image_frame.place(relx=0, rely=0, relwidth=1, relheight=0.65)
+        
+        # Game title overlay on image
+        self.game_title_frame = ctk.CTkFrame(
+            self.image_frame,
+            fg_color="#161616",  # Dark color instead of semi-transparent 
+            corner_radius=10,
+            height=40
+        )
+        self.game_title_frame.place(relx=0.02, rely=0.02, relwidth=0.4)
+        
+        self.game_title = ctk.CTkLabel(
+            self.game_title_frame,
+            text="SELECT A GAME",
+            font=("Orbitron", 16, "bold"),
+            text_color=accent_color
+        )
+        self.game_title.place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Image display area
         self.image_label = ctk.CTkLabel(self.image_frame, text="")
         self.image_label.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Description Panel
-        self.desc_frame = ctk.CTkFrame(self.right_content, fg_color="#202020", corner_radius=15)
-        self.desc_frame.place(relx=0, rely=0.75, relwidth=1, relheight=0.25)
-        self.desc_label = ctk.CTkLabel(
-            self.desc_frame,
-            text="",
-            wraplength=int(self.screen_width * 0.5),
-            font=("Orbitron", 16),
-            text_color="#FFFFFF"
+        # Game controls overlay
+        self.controls_frame = ctk.CTkFrame(
+            self.image_frame,
+            fg_color="#161616",  # Dark color instead of semi-transparent
+            corner_radius=10,
+            height=40
         )
-        self.desc_label.place(relx=0.5, rely=0.5, anchor="center")
+        self.controls_frame.place(relx=0.98, rely=0.98, relwidth=0.3, anchor="se")
+        
+        
+        self.controls_label = ctk.CTkLabel(
+            self.controls_frame,
+            text="↑/↓: Navigate | LEFT-TOP: Select",
+            font=("Orbitron", 12),
+            text_color=text_secondary
+        )
+        self.controls_label.place(relx=0.5, rely=0.5, anchor="center")
+
+        # Game info panel with tabs
+        self.info_frame = ctk.CTkTabview(
+            self.right_content,
+            fg_color="#151515",
+            corner_radius=15,
+            border_width=1,
+            border_color="#333333",
+            segmented_button_fg_color="#252525",
+            segmented_button_selected_color=accent_color,
+            segmented_button_selected_hover_color=highlight_color,
+            text_color=text_primary
+        )
+        self.info_frame.place(relx=0, rely=0.7, relwidth=1, relheight=0.3)
+        
+        # Create tabs
+        self.info_frame.add("DESCRIPTION")
+        
+        # Description tab content
+        self.desc_label = ctk.CTkLabel(
+            self.info_frame.tab("DESCRIPTION"),
+            text="Select a game to view its description",
+            wraplength=int(self.screen_width * 0.5),
+            font=("Orbitron", 14),
+            text_color=text_primary,
+            justify="left"
+        )
+        self.desc_label.place(relx=0.02, rely=0.02, relwidth=0.96)
+        
+    
+        # Footer with animated color effect
+        self.footer_frame = ctk.CTkFrame(self.main_container, fg_color=panel_bg, height=30, corner_radius=0)
+        self.footer_frame.place(relx=0, rely=1, relwidth=1, anchor="sw")
+        
+        
+        self.footer_label = ctk.CTkLabel(
+            self.footer_frame,
+            text="Created with ❤ by Orchids powered by STEM",
+            font=("Orbitron", 14, "bold"),
+            text_color="#888888"
+        )
+        self.footer_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # Initialize selection
         self.selected_index = 0
@@ -307,6 +419,7 @@ class GameApp(ctk.CTk):
         self.bind("<KeyPress-s>", self.move_down)
         self.bind("<KeyPress-space>", self.select_item)
         self.bind("<KeyPress-Escape>", self.close_window)
+
     
     def read_txt(self, game_name):
         try:
@@ -319,10 +432,14 @@ class GameApp(ctk.CTk):
         for i, button in enumerate(self.items):
             if i == self.selected_index:
                 button.set_selected(True)
-
-                # Load and display game image
-                image_path = f"{current_path}/games/games_images/{button.cget('text')}.jpg"
-                image_width = int(self.screen_width * 0.5)
+                game_name = button.cget('text')
+                
+                # Update game title
+                self.game_title.configure(text=game_name.upper())
+                
+                # Load and display game image with enhanced fade effect
+                image_path = f"{current_path}/games/games_images/{game_name}.jpg"
+                image_width = int(self.screen_width * 0.6)
                 image_height = int(self.screen_height * 0.4)
 
                 threading.Thread(
@@ -332,13 +449,14 @@ class GameApp(ctk.CTk):
                 ).start()
 
                 # Load and display game description
-                text = self.read_txt(button.cget('text'))
+                text = self.read_txt(game_name)
                 self.desc_label.configure(
-                    text=f"{button.cget('text')}\n"
-                        f"{text}"
+                    text=text,
+                    justify="left"
                 )
+                
 
-                # Calculate scroll position to center the selected item
+                # Calculate scroll position to center the selected item with animation
                 button.update_idletasks()
                 scroll_frame_height = self.scroll_frame.winfo_height()
                 button_height = button.winfo_height()
@@ -353,18 +471,55 @@ class GameApp(ctk.CTk):
                 # Ensure scroll fraction stays within bounds (0-1)
                 scroll_fraction = max(0, min(scroll_fraction, 1))
                 
-                # Apply the scroll
-                self.scroll_frame._parent_canvas.yview_moveto(scroll_fraction)
+                # Apply the scroll with smooth animation
+                current_scroll = self.scroll_frame._parent_canvas.yview()[0]
+                self.animate_scroll(current_scroll, scroll_fraction)
                 
             else:
                 button.set_selected(False)
 
+    def animate_scroll(self, start, end):
+        """Smooth scrolling animation"""
+        steps = 10
+        step_size = (end - start) / steps
+        
+        def step(current_step):
+            if current_step < steps:
+                new_pos = start + (step_size * current_step)
+                self.scroll_frame._parent_canvas.yview_moveto(new_pos)
+                self.after(10, lambda: step(current_step + 1))
+            else:
+                self.scroll_frame._parent_canvas.yview_moveto(end)
+        
+        step(1)
+
     def fade_image(self, new_image_path, target_width, target_height):
         try:
-            steps = 10
+            steps = 5  # More steps for smoother transition
+            
+            # First fade out current image if exists
+            if hasattr(self.image_label, 'image') and self.image_label.image:
+                for alpha in range(255, 0, -int(255 / steps)):
+                    # Apply alpha to current image
+                    if hasattr(self, '_current_image_pil'):
+                        temp_overlay = self._current_image_pil.copy()
+                        temp_overlay.putalpha(alpha)
+                        temp_image = ImageTk.PhotoImage(temp_overlay)
+                        self.image_label.configure(image=temp_image)
+                        self.image_label.image = temp_image
+                        self.update()
+                        time.sleep(0.015)
+            
+            # Now fade in new image with slight pause
+            time.sleep(0.05)
+            
             overlay = Image.open(new_image_path).convert("RGBA")
             resized_overlay = overlay.resize((target_width, target_height), Image.LANCZOS)
-
+            self._current_image_pil = resized_overlay.copy()  # Store for later fade-out
+            
+            # Add subtle drop shadow and rounded corners effect
+            # (This would be approximated in PIL but actual effects would need more complex image processing)
+            
             for alpha in range(0, 255 + int(255 / steps), int(255 / steps)):
                 temp_overlay = resized_overlay.copy()
                 temp_overlay.putalpha(alpha)
@@ -373,14 +528,31 @@ class GameApp(ctk.CTk):
                 self.image_label.configure(image=temp_image)
                 self.image_label.image = temp_image
                 self.update()
-                time.sleep(0.02)
+                time.sleep(0.015)
 
             final_image_tk = ImageTk.PhotoImage(resized_overlay)
             self.image_label.configure(image=final_image_tk)
             self.image_label.image = final_image_tk
 
         except FileNotFoundError:
-            self.image_label.configure(image=None, text="Image not found")
+            # Create a stylish "no image" placeholder
+            self.image_label.configure(image=None)
+            no_image_frame = ctk.CTkFrame(
+                self.image_label, 
+                fg_color="#222222", 
+                corner_radius=15,
+                width=target_width,
+                height=target_height
+            )
+            no_image_frame.place(relx=0.5, rely=0.5, anchor="center")
+            
+            no_image_label = ctk.CTkLabel(
+                no_image_frame,
+                text="No Image Available",
+                font=("Orbitron", 24, "bold"),
+                text_color="#555555"
+            )
+            no_image_label.place(relx=0.5, rely=0.5, anchor="center")
 
     def move_up(self, event):
         if self.selected_index > 0:
@@ -391,25 +563,90 @@ class GameApp(ctk.CTk):
         if self.selected_index < len(self.items) - 1:
             self.selected_index += 1
             self.update_selection()
-
-    def select_item(self, event):
+    
+    def select_item(self, event=None):
+        # Prevent rapid clicking/selection
+            
         if time.time() - self.last_select_item > 0.5:
-            selected_item = self.items[self.selected_index]
-            game_name = selected_item.cget("text")
+            # Visual feedback when game is selected
+            selected_button = self.items[self.selected_index]
+            selected_button.configure(fg_color="#FF5722")  # Highlight with accent color
+            
+            # Get game information
+            game_name = selected_button.cget("text")
             game_info = self.games_dict.get(game_name)
-
+            
+            self.update()
+            
             if game_info:
                 game_path = game_info["path"]
+                launch_success = False
                 
-                if game_info["type"] == "python":
-                    os.system(f"python {game_path}")  # Run Pygame game
+                try:
+                    # Create launch command based on game type
+                    if game_info["type"] == "python":
+                        # Run Pygame game
+                        subprocess.Popen(["python", game_path], 
+                                        stderr=subprocess.PIPE,
+                                        stdout=subprocess.PIPE)
+                        launch_success = True
+                        
+                    elif game_info["type"] == "emulator":
+                        # Run GBA/GB game with mGBA emulator
+                        subprocess.Popen(["/usr/games/mgba-qt", game_path],
+                                        stderr=subprocess.PIPE,
+                                        stdout=subprocess.PIPE)
+                        launch_success = True
+                        
+                    # Handle launch result
+                    if launch_success:
+                        pass
+                    else:
+                        # Show error if launch failed
+                        self.show_notification(f"Failed to launch {game_name}", "error")
+                        
+                except Exception as e:
+                    # Handle any exceptions during launch
+                    error_msg = str(e)
+                    self.show_notification(f"Error launching {game_name}: {error_msg}", "error")
                     
-                elif game_info["type"] == "emulator":
-                    
-                    os.system(f"/usr/games/mgba-qt {game_path}")  # Run GBA/GB game with mGBA emulator
-
-
+            # Reset button appearance after short delay
+            self.after(300, lambda: selected_button.configure(fg_color="#252525"))
+            
+            # Update timestamp to prevent rapid clicking
             self.last_select_item = time.time()
+
+    def show_notification(self, message, notification_type="info"):
+        """Show a temporary notification message"""
+        colors = {
+            "info": "#2196F3",  # Blue
+            "success": "#4CAF50",  # Green
+            "error": "#F44336"  # Red
+        }
+        
+        # Create notification frame
+        if hasattr(self, 'notification_frame'):
+            self.notification_frame.destroy()
+            
+        self.notification_frame = ctk.CTkFrame(
+            self.content_frame,
+            fg_color=colors.get(notification_type, "#2196F3"),
+            corner_radius=10,
+            height=40
+        )
+        self.notification_frame.place(relx=0.5, rely=0.95, anchor="center", relwidth=0.3)
+        
+        # Notification text
+        notification_label = ctk.CTkLabel(
+            self.notification_frame,
+            text=message,
+            font=("Orbitron", 14, "bold"),
+            text_color="#FFFFFF"
+        )
+        notification_label.place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Auto-hide after 3 seconds
+        self.after(3000, lambda: self.notification_frame.destroy() if hasattr(self, 'notification_frame') else None)
 
     def close_window(self, event):
         current_time = time.time()
@@ -421,8 +658,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
