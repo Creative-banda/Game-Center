@@ -30,21 +30,21 @@ def run_command(command):
 
 # Updating system packages
 def update_system():
-    print("Updating system packages...")
-    run_command("sudo apt update && sudo apt upgrade -y")
+    print("Refreshing package list...")
+    run_command("sudo apt update")
+
 
 # Installing Python & Pip
 def install_python_pip():
     print("Installing Python 3 and Pip...")
-    run_command("sudo apt install python3 -y")
     run_command("sudo apt install python3-pip -y")
     run_command("sudo python3 -m pip install --upgrade pip")
 
 # Installing required libraries
 def install_libraries():
-    print("Installing required libraries...")
+    print("Installing required system libraries...")
 
-    libraries = [
+    system_libraries = [
         "python3-tk",
         "python3-dev",
         "libsdl2-dev",
@@ -59,10 +59,11 @@ def install_libraries():
         "mgba-qt"
     ]
 
-    for lib in libraries:
-        run_command(f"sudo apt install {lib} -y")
+    # Install all system libraries in one command
+    run_command(f"sudo apt install {' '.join(system_libraries)} -y")
 
-    # Install Python packages via pip
+    print("Installing required Python pip packages...")
+
     pip_packages = [
         "customtkinter",
         "keyboard",
@@ -71,22 +72,24 @@ def install_libraries():
         "pyautogui",
         "Pillow",
     ]
-    for package in pip_packages:
-        run_command(f"sudo pip3 install {package} --break-system-packages")
+
+    # Install all pip packages in one command
+    run_command(f"sudo pip3 install {' '.join(pip_packages)} --break-system-packages")
+
 
 # Troubleshooting PIL issues    
 def trouble_shooting():
     print("Checking and fixing PIL issues if any...")
     try:
         run_command("sudo apt install --reinstall python3-pil python3-tk")
-        run_command("pip install --break-system-packages --upgrade --force-reinstall pillow")
+        run_command("pip3 install --break-system-packages --upgrade --force-reinstall pillow")
     except Exception as e:
         print(f"\n⚠️  Uh-oh! Troubleshooting failed: {e}")  
         print("   🛠️  Try these commands to fix things:")  
         print("""   
             📝 Run these one by one:  
             sudo apt install --reinstall python3-pil python3-tk  
-            pip install --break-system-packages --upgrade --force-reinstall pillow  
+            pip3 install --break-system-packages --upgrade --force-reinstall pillow  
             """)  
         print("   🔧 If the issue persists, check the troubleshooting guide.")
            
