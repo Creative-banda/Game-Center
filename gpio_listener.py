@@ -7,7 +7,12 @@ import keyboard  # To simulate keypress events
 
 from threading import Thread
 from show_shutdown_overlay import show_shutdown
-from screen_shot_layout import take_screenshot
+import subprocess
+from pathlib import Path
+
+
+# Get the current script's directory
+current_path = Path(__file__).parent.resolve()
 
 # Define GPIO pin mappings
 PIN_MAPPING = {
@@ -87,7 +92,7 @@ def gpio_listener():
                         if output == "screenshot":         
                             if time.time() - last_screenshot > 1:
                                 print("Screenshot combination detected! 📸")
-                                Thread(target=take_screenshot).start()
+                                subprocess.Popen(["sudo","python3",f"{current_path}/screen_shot_layout.py"])
                                 last_screenshot = time.time()
                         
                         else:

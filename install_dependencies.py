@@ -55,7 +55,8 @@ def install_libraries():
         "libjpeg-dev",
         "python3-rpi.gpio",
         "xdotool",
-        "mgba-qt"
+        "mgba-qt",
+        "gnome-screenshot",
     ]
 
     # Install all system libraries in one command
