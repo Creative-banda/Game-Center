@@ -66,7 +66,10 @@ def install_libraries():
     pip_packages = [
         "customtkinter",
         "keyboard",
-        "pygame"
+        "pygame",
+        "opencv-python",
+        "pyautogui",
+        "Pillow",
     ]
     for package in pip_packages:
         run_command(f"sudo pip3 install {package} --break-system-packages")
