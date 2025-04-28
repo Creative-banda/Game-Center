@@ -14,9 +14,8 @@ def show_shutdown():
     root.configure(bg="#101010")
 
     # --- Fonts ---
-    # Use a retro/gaming font like 'Press Start 2P' or 'VT323' if installed
-    font_main = ("Courier New", 32, "bold")  # Placeholder: You can replace this with a cool pixel font
-    font_sub = ("Courier New", 14, "normal")
+    font_main = ("Orbitron", 32, "bold") 
+    font_sub = ("Orbitron", 14, "normal")
 
     # --- Center Icon (text-based emoji style) ---
     icon_label = tk.Label(
@@ -72,4 +71,7 @@ def show_shutdown():
 
     root.after(2500, delayed_shutdown)
     root.mainloop()
-    root.destroy()
+
+if __name__ == "__main__":
+    # Show the shutdown overlay
+    show_shutdown()

@@ -1,9 +1,13 @@
+# Import necessary libraries
+
+
 import RPi.GPIO as GPIO
 import time, os
 import keyboard  # To simulate keypress events
 
 from threading import Thread
 from show_shutdown_overlay import show_shutdown
+from screen_shot_layout import take_screenshot
 
 # Define GPIO pin mappings
 PIN_MAPPING = {
@@ -24,7 +28,12 @@ KEY_COMBINATIONS = {
     (6, 12, 20): ["shift", "f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_RIGHT → Shift + F1
     (6, 12, 21): ["enter"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_DOWN → Return(Enter)
     (6, 12, 26): ["ctrl"+"f"], # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_LEFT → CTRL + F
+    (13, 19, 16): "screenshot", # LEFT_HAND_LEFT + LEFT_HAND_RIGHT + RIGHT_HAND_UP → Screenshot
 }
+
+
+last_screenshot = 0  # Initialize last_screenshot to 0
+
 
 # GPIO Setup
 GPIO.setmode(GPIO.BCM)
@@ -40,8 +49,11 @@ shutdown_pin = 5
 shutdown_hold_start = None
 shutdown_triggered = False
 
+
 def gpio_listener():
     print("Listening for GPIO inputs... (Press Ctrl+C to stop)")
+    global last_screenshot
+
     try:
         while True:
             active_pins = {pin for pin in PIN_MAPPING.keys() if GPIO.input(pin) == GPIO.LOW}
@@ -67,19 +79,29 @@ def gpio_listener():
 
             # Handle combinations first
             handled_combinations = False  
-            for combo, output_keys in KEY_COMBINATIONS.items():
+            for combo, output in KEY_COMBINATIONS.items():
                 if all(pin in active_pins for pin in combo):
-                    if combo not in active_combinations:  # Only press keys if not already active
+                    if combo not in active_combinations:  # Only act if not already active
                         active_combinations.add(combo)
-                        for key in output_keys:
-                            keyboard.press(key)
-                            pressed_keys.add(key)
+                        
+                        if output == "screenshot":         
+                            if time.time() - last_screenshot > 1:
+                                print("Screenshot combination detected! 📸")
+                                Thread(target=take_screenshot).start()
+                                last_screenshot = time.time()
+                        
+                        else:
+                            for key in output:
+                                keyboard.press(key)
+                                pressed_keys.add(key)
                     handled_combinations = True
-                elif combo in active_combinations:  # If combo is no longer pressed, release keys
-                    for key in output_keys:
-                        keyboard.release(key)
-                        pressed_keys.discard(key)
+                elif combo in active_combinations:
+                    if output != "screenshot":
+                        for key in output:
+                            keyboard.release(key)
+                            pressed_keys.discard(key)
                     active_combinations.discard(combo)
+
 
             # Process regular key mappings ONLY if no combinations were handled
             if not handled_combinations:

@@ -3,11 +3,18 @@ from PIL import Image, ImageTk
 import os, subprocess
 import time
 import threading
-import socket, pathlib
-from itertools import cycle
+import socket
+
+from pathlib import Path
 
 
-current_path = pathlib.Path(__file__).parent.resolve()
+current_path = Path(__file__).parent.resolve()
+
+screenshots_folder = current_path / 'screenshots'
+
+# Make sure the screenshots folder exists (create it once at the start)
+screenshots_folder.mkdir(exist_ok=True)
+
 
 listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
@@ -27,10 +34,14 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        self.after(500,self.set_focus)
+        # self.after(500,self.set_focus)
+        
+        
+        self.games_selected_index = 0
+        self.screenshot_selected_index = 0
         
         self.update_idletasks()
-        self.set_focus()
+        # self.set_focus()
                
         self.last_closing_attempt = time.time()
 
@@ -39,6 +50,10 @@ class GameApp(ctk.CTk):
         
         # Repo path
         self.repo_path = os.path.dirname(os.path.abspath(__file__)) 
+        
+        # Last ScreenShot Time
+        
+        self.last_screenshot = time.time()  # Fixed the assignment to use time.time() correctly
     
     def set_focus(self):
         self.focus_force()
@@ -249,7 +264,6 @@ class GameApp(ctk.CTk):
         )
         self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
         
-
         # Content Frame - Main area with rounded corners
         self.content_frame = ctk.CTkFrame(
             self.main_container, 
@@ -260,18 +274,40 @@ class GameApp(ctk.CTk):
         )
         self.content_frame.place(relx=0.5, rely=0.52, anchor="center", relwidth=0.95, relheight=0.82)
         
-
-
-        # Scrollable Game List with title
+        # Tab system for Games and Screenshots
+        self.tab_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
+        self.tab_frame.place(relx=0.02, rely=0.01, relwidth=0.28)
+        
+        # Create tab buttons
+        self.tab_buttons = []
+        self.tabs = ["GAMES", "SCREENSHOTS"]
+        self.current_tab = "GAMES"  # Default tab
+        
+        for i, tab_name in enumerate(self.tabs):
+            tab_button = ctk.CTkButton(
+                self.tab_frame,
+                text=tab_name,
+                font=("Orbitron", 14, "bold"),
+                fg_color="#252525" if tab_name != self.current_tab else accent_color,
+                hover_color="#303030" if tab_name != self.current_tab else highlight_color,
+                text_color=text_primary,
+                corner_radius=10,
+                height=35,
+                width=int(self.screen_width * 0.12),
+                command=lambda t=tab_name: self.switch_tab(t)
+            )
+            tab_button.place(relx=0.5*i, rely=0, anchor="nw")
+            self.tab_buttons.append(tab_button)
+            
+        # Games title below tabs
         self.games_title = ctk.CTkLabel(
             self.content_frame,
             text="GAME LIBRARY",
             font=("Orbitron", 16, "bold"),
             text_color=accent_color
         )
-        self.games_title.place(relx=0.02, rely=0.04)
+        self.games_title.place(relx=0.02, rely=0.08)
         
-
         # Improved scrollable game list
         self.scroll_frame = ctk.CTkScrollableFrame(
             self.content_frame,
@@ -281,12 +317,29 @@ class GameApp(ctk.CTk):
             border_width=1,
             border_color="#333333"
         )
-        self.scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.83)
+        self.scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
 
         # Game Buttons
         self.items = []
         self.games_dict = {}  # Store game type and path
         
+        # Screenshots frame (initially hidden)
+        self.screenshot_scroll_frame = ctk.CTkScrollableFrame(
+            self.content_frame,
+            fg_color="#151515",
+            corner_radius=15,
+            width=int(self.screen_width * 0.25),
+            border_width=1,
+            border_color="#333333"
+        )
+        self.screenshot_scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
+        self.screenshot_scroll_frame.place_forget()  # Initially hidden
+
+        # Screenshots Items
+        self.screenshot_items = []
+        self.screenshot_paths = []
+        
+        # Load games
         all_games = []
         game_folder = f"{current_path}/games"
         files = os.listdir(game_folder)
@@ -314,6 +367,9 @@ class GameApp(ctk.CTk):
             )
             button.pack(pady=5, padx=8, fill="x")
             self.items.append(button)
+        
+        # Load screenshots
+        self.load_screenshots()
 
         # Right Content Area - Game details
         self.right_content = ctk.CTkFrame(self.content_frame, fg_color="transparent")
@@ -357,12 +413,12 @@ class GameApp(ctk.CTk):
             corner_radius=10,
             height=40
         )
-        self.controls_frame.place(relx=0.98, rely=0.98, relwidth=0.3, anchor="se")
+        self.controls_frame.place(relx=0.98, rely=0.98, relwidth=0.4, anchor="se")
         
-        
+        # Default controls text for games tab
         self.controls_label = ctk.CTkLabel(
             self.controls_frame,
-            text="↑/↓: Navigate | LEFT-TOP: Select",
+            text="↑/↓: Navigate | ←/→: Switch Tabs | LEFT-TOP: Select",
             font=("Orbitron", 12),
             text_color=text_secondary
         )
@@ -396,11 +452,9 @@ class GameApp(ctk.CTk):
         )
         self.desc_label.place(relx=0.02, rely=0.02, relwidth=0.96)
         
-    
         # Footer with animated color effect
         self.footer_frame = ctk.CTkFrame(self.main_container, fg_color=panel_bg, height=30, corner_radius=0)
         self.footer_frame.place(relx=0, rely=1, relwidth=1, anchor="sw")
-        
         
         self.footer_label = ctk.CTkLabel(
             self.footer_frame,
@@ -417,10 +471,295 @@ class GameApp(ctk.CTk):
         # Input Bindings
         self.bind("<KeyPress-w>", self.move_up)
         self.bind("<KeyPress-s>", self.move_down)
+        self.bind("<KeyPress-a>", self.previous_tab)
+        self.bind("<KeyPress-d>", self.next_tab)
         self.bind("<KeyPress-space>", self.select_item)
+        self.bind("<KeyPress-f>", self.delete_screenshot)
         self.bind("<KeyPress-Escape>", self.close_window)
 
-    
+    def select_screenshot(self, index):
+        self.screenshot_selected_index = index
+        self.update_selection()
+
+
+    def load_screenshots(self):
+        print("Loading screenshots...")
+        """Load screenshots from the screenshots folder"""
+        self.screenshot_items = []
+        self.screenshot_paths = []
+
+        screenshot_folder = f"{current_path}/screenshots"
+        
+        # Create folder if it doesn't exist
+        if not os.path.exists(screenshot_folder):
+            os.makedirs(screenshot_folder)
+            
+        # Get all image files
+        valid_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp']
+        files = os.listdir(screenshot_folder)
+        screenshot_files = [f for f in files if os.path.splitext(f)[1].lower() in valid_extensions]
+        
+        # Clear existing items
+        for widget in self.screenshot_scroll_frame.winfo_children():
+            widget.destroy()
+
+        # Create thumbnail buttons for screenshots
+        for file in screenshot_files:
+            screenshot_path = f"{screenshot_folder}/{file}"
+            self.screenshot_paths.append(screenshot_path)
+
+            try:
+                pil_img = Image.open(screenshot_path)
+                pil_img.thumbnail((int(self.screen_width * 0.06), int(self.screen_height * 0.05)))
+                ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img,
+                                    size=(int(self.screen_width * 0.06), int(self.screen_height * 0.05)))
+            except Exception as e:
+                ctk_img = None  # If image loading fails
+
+            # Create button directly
+            btn = ctk.CTkButton(
+                self.screenshot_scroll_frame,
+                text=file[:15] + "..." if len(file) > 15 else file,
+                image=ctk_img,
+                anchor="w",
+                compound="left",
+                height=int(self.screen_height * 0.07),
+                fg_color="#252525",
+                hover_color="#353535",
+                font=("Orbitron", 12),
+                command=lambda path=screenshot_path, idx=len(self.screenshot_items): self.select_screenshot(idx)
+            )
+            btn.pack(pady=5, padx=8, fill="x")
+
+            self.screenshot_items.append(btn)
+
+
+
+    def switch_tab(self, tab_name):
+        """Switch between Games and Screenshots tabs"""
+        self.current_tab = tab_name
+        
+        # Update tab button colors
+        accent_color = "#FF5722"  # Vibrant orange accent
+        highlight_color = "#2196F3"  # Blue highlight
+        
+        for i, name in enumerate(self.tabs):
+            self.tab_buttons[i].configure(
+                fg_color="#252525" if name != tab_name else accent_color,
+                hover_color="#303030" if name != tab_name else highlight_color
+            )
+        
+        # Hide/show appropriate frames
+        if tab_name == "GAMES":
+            self.scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
+            self.screenshot_scroll_frame.place_forget()
+            self.games_title.configure(text="GAME LIBRARY")
+            self.controls_label.configure(text="↑/↓: Navigate | ←/→: Switch Tabs | LEFT-TOP: Select")
+        else:  # SCREENSHOTS
+            self.load_screenshots()
+            self.scroll_frame.place_forget()
+            self.screenshot_scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
+            self.games_title.configure(text="SCREENSHOTS")
+            self.controls_label.configure(text="↑/↓: Navigate | ←/→: Switch Tabs | F: Delete")
+        
+        # Update selection highlighting
+        self.update_selection()
+
+    def previous_tab(self, event=None):
+        """Switch to the previous tab using A key"""
+        current_index = self.tabs.index(self.current_tab)
+        new_index = (current_index - 1) % len(self.tabs)
+        self.switch_tab(self.tabs[new_index])
+
+    def next_tab(self, event=None):
+        """Switch to the next tab using D key"""
+        current_index = self.tabs.index(self.current_tab)
+        new_index = (current_index + 1) % len(self.tabs)
+        self.switch_tab(self.tabs[new_index])
+
+    def delete_screenshot(self, event=None):
+        """Handle screenshot deletion with confirmation dialog"""
+        if self.current_tab != "SCREENSHOTS" or not self.screenshot_paths or self.screenshot_selected_index >= len(self.screenshot_paths):
+            return
+            
+        # Get the path of the selected screenshot
+        screenshot_path = self.screenshot_paths[self.screenshot_selected_index]
+        file_name = os.path.basename(screenshot_path)
+        
+        # Create confirmation dialog
+        self.confirm_dialog = ctk.CTkToplevel(self)
+        self.confirm_dialog.title("Confirm Deletion")
+        self.confirm_dialog.geometry("400x150")
+        self.confirm_dialog.resizable(False, False)
+        self.confirm_dialog.configure(fg_color="#1A1A1A")
+        
+        # Add a transient attribute (makes dialog a child of the main window)
+        self.confirm_dialog.transient(self)
+        self.confirm_dialog.grab_set()  # Make dialog modal
+        
+        # Center the dialog relative to the main window
+        x = self.winfo_x() + (self.winfo_width() // 2) - (400 // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (150 // 2)
+        self.confirm_dialog.geometry(f"+{x}+{y}")
+        
+        # Dialog content
+        message_label = ctk.CTkLabel(
+            self.confirm_dialog,
+            text=f"Are you sure you want to delete:\n{file_name}?",
+            font=("Orbitron", 14),
+            text_color="#FFFFFF"
+        )
+        message_label.pack(pady=20)
+        
+        # Button frame
+        button_frame = ctk.CTkFrame(self.confirm_dialog, fg_color="transparent")
+        button_frame.pack(pady=10)
+        
+        # Store the current button selection
+        self.dialog_selection = 0  # 0 for No, 1 for Yes
+        
+        # Button styles
+        button_width = 100
+        button_height = 35
+        
+        # No button (default)
+        self.no_button = ctk.CTkButton(
+            button_frame,
+            text="No",
+            font=("Orbitron", 12, "bold"),
+            fg_color="#FF5722",  # Accent color for selected option
+            hover_color="#FF7043",
+            corner_radius=10,
+            width=button_width,
+            height=button_height,
+            command=lambda: self.confirm_dialog.destroy()
+        )
+        self.no_button.pack(side="left", padx=10)
+        
+        # Yes button
+        self.yes_button = ctk.CTkButton(
+            button_frame,
+            text="Yes",
+            font=("Orbitron", 12, "bold"),
+            fg_color="#252525",  # Default color for unselected option
+            hover_color="#303030",
+            corner_radius=10,
+            width=button_width,
+            height=button_height,
+            command=lambda: self.delete_confirmed(screenshot_path)
+        )
+        self.yes_button.pack(side="left", padx=10)
+        
+        # Bind A/D keys for dialog navigation
+        self.confirm_dialog.bind("<KeyPress-a>", self.dialog_previous)
+        self.confirm_dialog.bind("<KeyPress-d>", self.dialog_next)
+        self.confirm_dialog.bind("<KeyPress-space>", self.dialog_select)
+        self.confirm_dialog.bind("<KeyPress-Escape>", lambda e: self.confirm_dialog.destroy())
+        
+        # Update dialog button selection
+        self.update_dialog_selection()
+
+    def update_dialog_selection(self):
+        """Update the selection highlighting in the confirmation dialog"""
+        if hasattr(self, 'confirm_dialog') and self.confirm_dialog.winfo_exists():
+            if self.dialog_selection == 0:  # No selected
+                self.no_button.configure(fg_color="#FF5722")
+                self.yes_button.configure(fg_color="#252525")
+            else:  # Yes selected
+                self.no_button.configure(fg_color="#252525")
+                self.yes_button.configure(fg_color="#FF5722")
+
+    def dialog_previous(self, event=None):
+        """Move dialog selection left (No)"""
+        self.dialog_selection = 0
+        self.update_dialog_selection()
+
+    def dialog_next(self, event=None):
+        """Move dialog selection right (Yes)"""
+        self.dialog_selection = 1
+        self.update_dialog_selection()
+
+    def dialog_select(self, event=None):
+        """Confirm the dialog selection with space key"""
+        if hasattr(self, 'confirm_dialog') and self.confirm_dialog.winfo_exists():
+            if self.dialog_selection == 0:  # No
+                self.confirm_dialog.destroy()
+            else:  # Yes
+                screenshot_path = self.screenshot_paths[self.screenshot_selected_index]
+                self.delete_confirmed(screenshot_path)
+
+    def delete_confirmed(self, path):
+        """Delete the screenshot after confirmation"""
+        try:
+            # Delete the file
+            os.remove(path)
+            
+            # Close the dialog
+            if hasattr(self, 'confirm_dialog') and self.confirm_dialog.winfo_exists():
+                self.confirm_dialog.destroy()
+                
+            # Reload screenshots
+            self.load_screenshots()
+            
+            # Reset selected index if needed
+            if not self.screenshot_items:
+                self.screenshot_selected_index = 0
+            elif self.screenshot_selected_index >= len(self.screenshot_items):
+                self.screenshot_selected_index = len(self.screenshot_items) - 1
+                
+            # Update UI
+            self.update_selection()
+            
+        except Exception as e:
+            # Show error message
+            if hasattr(self, 'confirm_dialog') and self.confirm_dialog.winfo_exists():
+                error_label = ctk.CTkLabel(
+                    self.confirm_dialog,
+                    text=f"Error: {str(e)}",
+                    font=("Orbitron", 12),
+                    text_color="#FF0000"
+                )
+                error_label.pack(pady=10)
+
+    def display_screenshot(self, path):
+
+        """Display selected screenshot in the main image area"""
+        try:
+            # Update title
+            file_name = os.path.basename(path)
+            self.game_title.configure(text=file_name[:25] + "..." if len(file_name) > 25 else file_name)
+            
+            # Load and resize image to fit display area
+            pil_img = Image.open(path)
+            # Calculate aspect ratio preserving size
+            img_width, img_height = pil_img.size
+            display_width = int(self.screen_width * 0.6)
+            display_height = int(self.screen_height * 0.5)
+            
+            # Calculate scaling factor to fit within display area while maintaining aspect ratio
+            width_ratio = display_width / img_width
+            height_ratio = display_height / img_height
+            scale_factor = min(width_ratio, height_ratio)
+            
+            new_width = int(img_width * scale_factor)
+            new_height = int(img_height * scale_factor)
+            
+            # Create CTkImage
+            ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(new_width, new_height))
+            self.image_label.configure(image=ctk_img)
+            
+            # Update description
+            file_size = os.path.getsize(path) / 1024  # KB
+            file_date = time.ctime(os.path.getmtime(path))
+            resolution = f"{img_width}x{img_height}"
+            
+            desc_text = f"File: {file_name}\nResolution: {resolution}\nSize: {file_size:.1f} KB\nDate: {file_date}"
+            self.desc_label.configure(text=desc_text)
+            
+        except Exception as e:
+            self.image_label.configure(image=None, text=f"Error loading image: {str(e)}")
+            self.desc_label.configure(text=f"Error: {str(e)}")
+
     def read_txt(self, game_name):
         try:
             with open(f"{current_path}/games/games_texts/{game_name}.txt", 'r') as file:
@@ -429,56 +768,78 @@ class GameApp(ctk.CTk):
             return "No Description"
         
     def update_selection(self):
-        for i, button in enumerate(self.items):
-            if i == self.selected_index:
-                button.set_selected(True)
-                game_name = button.cget('text')
-                
-                # Update game title
-                self.game_title.configure(text=game_name.upper())
-                
-                # Load and display game image with enhanced fade effect
-                image_path = f"{current_path}/games/games_images/{game_name}.jpg"
-                image_width = int(self.screen_width * 0.6)
-                image_height = int(self.screen_height * 0.4)
+        if self.current_tab == "GAMES":
+            # Handle game selection
+            for i, button in enumerate(self.items):
+                if i == self.games_selected_index:
+                    button.set_selected(True)
+                    game_name = button.cget('text')
 
-                threading.Thread(
-                    target=self.fade_image,
-                    args=(image_path, image_width, image_height),
-                    daemon=True
-                ).start()
+                    # Update game title
+                    self.game_title.configure(text=game_name.upper())
 
-                # Load and display game description
-                text = self.read_txt(game_name)
-                self.desc_label.configure(
-                    text=text,
-                    justify="left"
-                )
-                
+                    # Load and display game image with enhanced fade effect
+                    image_path = f"{current_path}/games/games_images/{game_name}.jpg"
+                    image_width = int(self.screen_width * 0.6)
+                    image_height = int(self.screen_height * 0.4)
 
-                # Calculate scroll position to center the selected item with animation
-                button.update_idletasks()
-                scroll_frame_height = self.scroll_frame.winfo_height()
-                button_height = button.winfo_height()
-                button_y = button.winfo_y()
-                
-                # Calculate the center position of the button
-                button_center = button_y + button_height / 2
-                
-                # Calculate the desired scroll position to center the button
-                scroll_fraction = (button_center - scroll_frame_height / 2) / (len(self.items) * button_height)
-                
-                # Ensure scroll fraction stays within bounds (0-1)
-                scroll_fraction = max(0, min(scroll_fraction, 1))
-                
-                # Apply the scroll with smooth animation
-                current_scroll = self.scroll_frame._parent_canvas.yview()[0]
-                self.animate_scroll(current_scroll, scroll_fraction)
-                
-            else:
-                button.set_selected(False)
+                    threading.Thread(
+                        target=self.fade_image,
+                        args=(image_path, image_width, image_height),
+                        daemon=True
+                    ).start()
 
-    def animate_scroll(self, start, end):
+                    # Load and display game description
+                    text = self.read_txt(game_name)
+                    self.desc_label.configure(
+                        text=text,
+                        justify="left"
+                    )
+
+                    # Calculate scroll position to center the selected item with animation
+                    button.update_idletasks()
+                    scroll_frame_height = self.scroll_frame.winfo_height()
+                    button_height = button.winfo_height()
+                    button_y = button.winfo_y()
+
+                    button_center = button_y + button_height / 2
+                    scroll_fraction = (button_center - scroll_frame_height / 2) / (len(self.items) * button_height)
+                    scroll_fraction = max(0, min(scroll_fraction, 1))
+
+                    current_scroll = self.scroll_frame._parent_canvas.yview()[0]
+                    self.animate_scroll(current_scroll, scroll_fraction, self.scroll_frame)
+                else:
+                    button.set_selected(False)
+
+        else:
+            # Handle screenshot selection
+            for i, button in enumerate(self.screenshot_items):  # <-- use "button", not "frame"
+                if i == self.screenshot_selected_index:
+                    button.configure(fg_color="#0D6EFD",  # Vibrant blue
+                    border_color="#0A58CA",
+                    hover_color="#1A74E9",
+                    text_color="#FFFFFF")  # Brighter text for contrast)  # <-- no border
+                    # Display selected screenshot
+                    if self.screenshot_paths and self.screenshot_selected_index < len(self.screenshot_paths):
+                        screenshot_path = self.screenshot_paths[self.screenshot_selected_index]
+                        self.display_screenshot(screenshot_path)
+
+                    # Center the selected item in the scroll view
+                    button.update_idletasks()
+                    scroll_frame_height = self.screenshot_scroll_frame.winfo_height()
+                    button_height = button.winfo_height()
+                    button_y = button.winfo_y()
+
+                    button_center = button_y + button_height / 2
+                    scroll_fraction = (button_center - scroll_frame_height / 2) / (len(self.screenshot_items) * button_height)
+                    scroll_fraction = max(0, min(scroll_fraction, 1))
+                    current_scroll = self.screenshot_scroll_frame._parent_canvas.yview()[0]
+                    self.animate_scroll(current_scroll, scroll_fraction, self.screenshot_scroll_frame)
+                else:
+                    button.configure(fg_color="#252525", hover_color="#353535")  # unselected
+
+
+    def animate_scroll(self, start, end, frame=None):
         """Smooth scrolling animation"""
         steps = 10
         step_size = (end - start) / steps
@@ -486,10 +847,16 @@ class GameApp(ctk.CTk):
         def step(current_step):
             if current_step < steps:
                 new_pos = start + (step_size * current_step)
-                self.scroll_frame._parent_canvas.yview_moveto(new_pos)
+                if frame is None:
+                    self.scroll_frame._parent_canvas.yview_moveto(new_pos)
+                else:
+                    frame._parent_canvas.yview_moveto(new_pos)
                 self.after(10, lambda: step(current_step + 1))
             else:
-                self.scroll_frame._parent_canvas.yview_moveto(end)
+                if frame is None:
+                    self.scroll_frame._parent_canvas.yview_moveto(end)
+                else:
+                    frame._parent_canvas.yview_moveto(end)
         
         step(1)
 
@@ -555,66 +922,74 @@ class GameApp(ctk.CTk):
             no_image_label.place(relx=0.5, rely=0.5, anchor="center")
 
     def move_up(self, event):
-        if self.selected_index > 0:
-            self.selected_index -= 1
-            self.update_selection()
+        if self.current_tab == "GAMES":
+            if self.games_selected_index > 0:
+                self.games_selected_index -= 1
+                self.update_selection()
+        else:  # Screenshots tab
+            if self.screenshot_selected_index > 0:
+                self.screenshot_selected_index -= 1
+                self.update_selection()
 
     def move_down(self, event):
-        if self.selected_index < len(self.items) - 1:
-            self.selected_index += 1
-            self.update_selection()
+        if self.current_tab == "GAMES":
+            if self.games_selected_index < len(self.items) - 1:
+                self.games_selected_index += 1
+                self.update_selection()
+        else:  # Screenshots tab
+            if self.screenshot_selected_index < len(self.screenshot_items) - 1:
+                self.screenshot_selected_index += 1
+                self.update_selection()
     
     def select_item(self, event=None):
-        # Prevent rapid clicking/selection
+        """Handle selection based on current tab"""
+        if self.current_tab == "GAMES":
+            # Original game selection code
+            if self.items and self.games_selected_index < len(self.items):
+                game_name = self.items[self.games_selected_index].cget("text")
+                game_info = self.games_dict.get(game_name)
             
-        if time.time() - self.last_select_item > 0.5:
-            # Visual feedback when game is selected
-            selected_button = self.items[self.selected_index]
-            selected_button.configure(fg_color="#FF5722")  # Highlight with accent color
-            
-            # Get game information
-            game_name = selected_button.cget("text")
-            game_info = self.games_dict.get(game_name)
-            
-            self.update()
-            
-            if game_info:
-                game_path = game_info["path"]
-                launch_success = False
+                self.update()
                 
-                try:
-                    # Create launch command based on game type
-                    if game_info["type"] == "python":
-                        # Run Pygame game
-                        subprocess.Popen(["python", game_path], 
-                                        stderr=subprocess.PIPE,
-                                        stdout=subprocess.PIPE)
-                        launch_success = True
-                        
-                    elif game_info["type"] == "emulator":
-                        # Run GBA/GB game with mGBA emulator
-                        subprocess.Popen(["/usr/games/mgba-qt", game_path],
-                                        stderr=subprocess.PIPE,
-                                        stdout=subprocess.PIPE)
-                        launch_success = True
-                        
-                    # Handle launch result
-                    if launch_success:
-                        pass
-                    else:
-                        # Show error if launch failed
-                        self.show_notification(f"Failed to launch {game_name}", "error")
-                        
-                except Exception as e:
-                    # Handle any exceptions during launch
-                    error_msg = str(e)
-                    self.show_notification(f"Error launching {game_name}: {error_msg}", "error")
+                if game_info:
+                    game_path = game_info["path"]
+                    launch_success = False
                     
-            # Reset button appearance after short delay
-            self.after(300, lambda: selected_button.configure(fg_color="#252525"))
-            
-            # Update timestamp to prevent rapid clicking
-            self.last_select_item = time.time()
+                    try:
+                        # Create launch command based on game type
+                        if game_info["type"] == "python":
+                            # Run Pygame game
+                            subprocess.Popen(["python", game_path], 
+                                            stderr=subprocess.PIPE,
+                                            stdout=subprocess.PIPE)
+                            launch_success = True
+                            
+                        elif game_info["type"] == "emulator":
+                            # Run GBA/GB game with mGBA emulator
+                            subprocess.Popen(["/usr/games/mgba-qt", game_path],
+                                            stderr=subprocess.PIPE,
+                                            stdout=subprocess.PIPE)
+                            launch_success = True
+                            
+                        # Handle launch result
+                        if launch_success:
+                            pass
+                        else:
+                            # Show error if launch failed
+                            self.show_notification(f"Failed to launch {game_name}", "error")
+                            
+                    except Exception as e:
+                        # Handle any exceptions during launch
+                        error_msg = str(e)
+                        self.show_notification(f"Error launching {game_name}: {error_msg}", "error")
+                                        
+                # Update timestamp to prevent rapid clicking
+                self.last_select_item = time.time()
+
+        else:  # SCREENSHOTS
+            # For screenshots, just display the full image
+            if self.screenshot_paths and self.screenshot_selected_index < len(self.screenshot_paths):
+                self.display_screenshot(self.screenshot_paths[self.screenshot_selected_index])
 
     def show_notification(self, message, notification_type="info"):
         """Show a temporary notification message"""
