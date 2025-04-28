@@ -16,7 +16,7 @@ screenshots_folder = current_path / 'screenshots'
 screenshots_folder.mkdir(exist_ok=True)
 
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -306,7 +306,7 @@ class GameApp(ctk.CTk):
             font=("Orbitron", 16, "bold"),
             text_color=accent_color
         )
-        self.games_title.place(relx=0.02, rely=0.08)
+        self.games_title.place(relx=0.02, rely=0.1)
         
         # Improved scrollable game list
         self.scroll_frame = ctk.CTkScrollableFrame(
@@ -317,7 +317,7 @@ class GameApp(ctk.CTk):
             border_width=1,
             border_color="#333333"
         )
-        self.scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
+        self.scroll_frame.place(relx=0.02, rely=0.55, anchor="w", relwidth=0.28, relheight=0.75)
 
         # Game Buttons
         self.items = []
@@ -404,7 +404,7 @@ class GameApp(ctk.CTk):
         
         # Image display area
         self.image_label = ctk.CTkLabel(self.image_frame, text="")
-        self.image_label.place(relx=0.5, rely=0.5, anchor="center")
+        self.image_label.place(relx=0.5, rely=0.55, anchor="center")
 
 
         # Game info panel with tabs
@@ -429,7 +429,7 @@ class GameApp(ctk.CTk):
             self.info_frame.tab("DESCRIPTION"),
             text="Select a game to view its description",
             wraplength=int(self.screen_width * 0.5),
-            font=("Orbitron", 14),
+            font=("Orbitron", 10),
             text_color=text_primary,
             justify="left"
         )
@@ -1014,8 +1014,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
