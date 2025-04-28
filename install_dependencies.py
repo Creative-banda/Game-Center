@@ -38,7 +38,6 @@ def update_system():
 def install_python_pip():
     print("Installing Python 3 and Pip...")
     run_command("sudo apt install python3-pip -y")
-    run_command("sudo python3 -m pip install --upgrade pip")
 
 # Installing required libraries
 def install_libraries():
