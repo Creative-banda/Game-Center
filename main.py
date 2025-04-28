@@ -34,14 +34,14 @@ class GameApp(ctk.CTk):
         self.screen_width = self.winfo_screenwidth()
         self.screen_height = self.winfo_screenheight()
         self.closing = 0
-        # self.after(500,self.set_focus)
+        self.after(500,self.set_focus)
         
         
         self.games_selected_index = 0
         self.screenshot_selected_index = 0
         
         self.update_idletasks()
-        # self.set_focus()
+        self.set_focus()
                
         self.last_closing_attempt = time.time()
 
