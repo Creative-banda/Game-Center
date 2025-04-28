@@ -259,7 +259,7 @@ class GameApp(ctk.CTk):
         self.logo_label = ctk.CTkLabel(
             self.header_frame,
             text=logo_text,
-            font=("Orbitron", 28, "bold"),
+            font=("Orbitron", 24, "bold"),
             text_color=accent_color
         )
         self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
@@ -287,7 +287,7 @@ class GameApp(ctk.CTk):
             tab_button = ctk.CTkButton(
                 self.tab_frame,
                 text=tab_name,
-                font=("Orbitron", 14, "bold"),
+                font=("Orbitron", 10, "bold"),
                 fg_color="#252525" if tab_name != self.current_tab else accent_color,
                 hover_color="#303030" if tab_name != self.current_tab else highlight_color,
                 text_color=text_primary,
@@ -406,23 +406,6 @@ class GameApp(ctk.CTk):
         self.image_label = ctk.CTkLabel(self.image_frame, text="")
         self.image_label.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Game controls overlay
-        self.controls_frame = ctk.CTkFrame(
-            self.image_frame,
-            fg_color="#161616",  # Dark color instead of semi-transparent
-            corner_radius=10,
-            height=40
-        )
-        self.controls_frame.place(relx=0.98, rely=0.98, relwidth=0.4, anchor="se")
-        
-        # Default controls text for games tab
-        self.controls_label = ctk.CTkLabel(
-            self.controls_frame,
-            text="↑/↓: Navigate | ←/→: Switch Tabs | LEFT-TOP: Select",
-            font=("Orbitron", 12),
-            text_color=text_secondary
-        )
-        self.controls_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # Game info panel with tabs
         self.info_frame = ctk.CTkTabview(
@@ -554,13 +537,11 @@ class GameApp(ctk.CTk):
             self.scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
             self.screenshot_scroll_frame.place_forget()
             self.games_title.configure(text="GAME LIBRARY")
-            self.controls_label.configure(text="↑/↓: Navigate | ←/→: Switch Tabs | LEFT-TOP: Select")
         else:  # SCREENSHOTS
             self.load_screenshots()
             self.scroll_frame.place_forget()
             self.screenshot_scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
             self.games_title.configure(text="SCREENSHOTS")
-            self.controls_label.configure(text="↑/↓: Navigate | ←/→: Switch Tabs | F: Delete")
         
         # Update selection highlighting
         self.update_selection()
@@ -1050,7 +1031,7 @@ class GameButton(ctk.CTkButton):
             fg_color="#202020",  # Deep matte black
             hover_color="#2D2D2D",  # Softer contrast
             text_color="#EDEDED",  # Softer white
-            font=("Orbitron", 17),  # Sleek & modern font
+            font=("Orbitron", 12),  # Sleek & modern font
             border_width=2,
             border_color="#333333"
         )
