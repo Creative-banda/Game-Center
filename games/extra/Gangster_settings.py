@@ -92,7 +92,7 @@ player_img = pygame.image.load(f"{CURRENT_PATH}/assets/conversation/player.png")
 player_img = pygame.transform.scale(player_img, (100 * scale_x, 150 * scale_y))
 
 enemy_img = pygame.image.load(f"{CURRENT_PATH}/assets/conversation/enemy.png").convert_alpha()
-enemy_img = pygame.transform.scale(enemy_img, (150 * scale_x, 150 * scale_x))
+enemy_img = pygame.transform.scale(enemy_img, (150 * scale_x, 150 * scale_y))
 
 # Grunge texture overlay
 

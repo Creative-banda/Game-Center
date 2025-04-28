@@ -40,7 +40,7 @@ achievement_timer = 0
 
 
 # TRACKING LOCAL VARIABLES
-current_level = 0
+current_level = 3
 isDeathSoundPlay = False
 
 # Create a surface for the fade out
@@ -971,7 +971,7 @@ def main():
     values = ["drop", "enemy","bomb"]
 
     # List of probabilities corresponding to each value
-    probabilities = [0.6, 0.2, 0.2]
+    probabilities = [0.5, 0.2, 0.3]
 
     while True:
         for event in pygame.event.get():
@@ -1178,14 +1178,14 @@ def main():
                 screen.blit(dialogue_box, (0, SCREEN_HEIGHT - (150 * scale_y)))
 
                 # Border for the dialogue box
-                pygame.draw.rect(screen, (255, 50, 50), (10, SCREEN_HEIGHT - (145 * scale_x), SCREEN_WIDTH - (20 * scale_y), 140), 3, border_radius=15)  
+                pygame.draw.rect(screen, (255, 50, 50), (10 * scale_x, SCREEN_HEIGHT - (145 * scale_y), SCREEN_WIDTH - (20 * scale_x), 140 * scale_y), 3, border_radius=15)  
 
                 # Display Character Image
                 if speaker == "Player":
                     screen.blit(player_img, (10*scale_x, SCREEN_HEIGHT - (130 * scale_y)))  # Left side
 
                     # Display text slightly shifted for better readability
-                    draw_text(text, 100 * scale_x, SCREEN_HEIGHT - (110 * scale_y),conversation_font , color=(255, 255, 255))
+                    draw_text(text, 100 * scale_x, SCREEN_HEIGHT - (110 * scale_y), conversation_font, color=(255, 255, 255))
                 
                 else:
                     screen.blit(enemy_img, (SCREEN_WIDTH - (140 * scale_x), SCREEN_HEIGHT - (130 * scale_y)))  # Right side
