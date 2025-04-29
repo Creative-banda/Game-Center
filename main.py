@@ -303,7 +303,7 @@ class GameApp(ctk.CTk):
         self.games_title = ctk.CTkLabel(
             self.content_frame,
             text="GAME LIBRARY",
-            font=("Orbitron", 16, "bold"),
+            font=("Orbitron", 13, "bold"),
             text_color=accent_color
         )
         self.games_title.place(relx=0.02, rely=0.1)
@@ -317,7 +317,7 @@ class GameApp(ctk.CTk):
             border_width=1,
             border_color="#333333"
         )
-        self.scroll_frame.place(relx=0.02, rely=0.55, anchor="w", relwidth=0.28, relheight=0.75)
+        self.scroll_frame.place(relx=0.02, rely=0.58, anchor="w", relwidth=0.28, relheight=0.75)
 
         # Game Buttons
         self.items = []
@@ -332,7 +332,7 @@ class GameApp(ctk.CTk):
             border_width=1,
             border_color="#333333"
         )
-        self.screenshot_scroll_frame.place(relx=0.02, rely=0.52, anchor="w", relwidth=0.28, relheight=0.75)
+        self.screenshot_scroll_frame.place(relx=0.02, rely=0.58, anchor="w", relwidth=0.28, relheight=0.75)
         self.screenshot_scroll_frame.place_forget()  # Initially hidden
 
         # Screenshots Items
