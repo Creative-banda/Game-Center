@@ -4,8 +4,18 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 from pygame import mixer
+import os
 
 mixer.init()
+
+env = os.environ.copy()
+
+
+# Set specific variables for the normal user (force normal user environment)
+env['USER'] = os.getlogin()  # Set the normal user name
+env['HOME'] = os.path.expanduser('~')  # Set home directory for the normal user
+env['XDG_RUNTIME_DIR'] = os.environ.get('XDG_RUNTIME_DIR', '/run/user/1000')  # Ensure display access
+
 
 current_path = Path(__file__).parent.resolve()
 
@@ -61,7 +71,7 @@ def take_screenshot():
         save_path = current_path / 'screenshots' / filename
 
         # Save the screenshot
-        subprocess.run(["grim", str(save_path)], check=True)
+        subprocess.run(["grim", str(save_path)], env=env)
 
         print(f"Screenshot saved as {save_path}")
         

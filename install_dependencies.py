@@ -56,7 +56,7 @@ def install_libraries():
         "python3-rpi.gpio",
         "xdotool",
         "mgba-qt",
-        "grim wayland wayland-protocols",
+        "grim",
     ]
 
     # Install all system libraries in one command

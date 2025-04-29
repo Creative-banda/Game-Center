@@ -92,7 +92,7 @@ def gpio_listener():
                         if output == "screenshot":         
                             if time.time() - last_screenshot > 1:
                                 print("Screenshot combination detected! 📸")
-                                subprocess.Popen(["sudo","python3",f"{current_path}/screen_shot_layout.py"])
+                                subprocess.Popen(["python3",f"{current_path}/screen_shot_layout.py"])
                                 last_screenshot = time.time()
                         
                         else:
