@@ -73,7 +73,7 @@ class GameApp(ctk.CTk):
         self.splash_content.place(relx=0.5, rely=0.5, anchor="center")
         
         # Stylish logo
-        image_size = min(self.screen_width, self.screen_height) * 0.8
+        image_size = min(self.screen_width, self.screen_height) * 0.7
         self.logo_image = ctk.CTkImage(
             dark_image=Image.open(f"{current_path}/logo.png"),
             size=(image_size, image_size)
@@ -87,10 +87,10 @@ class GameApp(ctk.CTk):
         self.title_label = ctk.CTkLabel(
             self.splash_content, 
             text="GAME CENTER", 
-            font=("Orbitron", 28, "bold"), 
+            font=("Orbitron", 24, "bold"), 
             text_color="#00CCFF"
         )
-        self.title_label.pack(pady=(5, 25))
+        self.title_label.pack(pady=(5, 15))
         
         # Create a progress bar for visual feedback
         self.progress_bar = ctk.CTkProgressBar(
