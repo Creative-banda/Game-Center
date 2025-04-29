@@ -25,6 +25,7 @@ class GameApp(ctk.CTk):
         self.title("Game Center")
         self.attributes('-fullscreen', True)
         self.configure(fg_color="black")
+        self.configure(cursor="none")  # Hide mouse cursor
         self.protocol("WM_DELETE_WINDOW", lambda: None)
         self.transitioning = False
         self.last_select_item = time.time()
