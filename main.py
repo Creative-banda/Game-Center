@@ -81,7 +81,7 @@ class GameApp(ctk.CTk):
         
         # Add logo with gaming style
         self.splash_label = ctk.CTkLabel(self.splash_content, text="", image=self.logo_image)
-        self.splash_label.pack(pady=20)
+        self.splash_label.pack(pady=5)
         
         # Add a title with gaming font
         self.title_label = ctk.CTkLabel(
