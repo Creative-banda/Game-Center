@@ -4,15 +4,16 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 from pygame import mixer
-import os
+import os, getpass
 
 mixer.init()
 
 env = os.environ.copy()
 
 
+
 # Set specific variables for the normal user (force normal user environment)
-env['USER'] = os.getlogin()  # Set the normal user name
+env['USER'] = getpass.getuser()  # Set the normal user name
 env['HOME'] = os.path.expanduser('~')  # Set home directory for the normal user
 env['XDG_RUNTIME_DIR'] = os.environ.get('XDG_RUNTIME_DIR', '/run/user/1000')  # Ensure display access
 
