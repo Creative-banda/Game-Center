@@ -16,7 +16,7 @@ screenshots_folder = current_path / 'screenshots'
 screenshots_folder.mkdir(exist_ok=True)
 
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -715,7 +715,7 @@ class GameApp(ctk.CTk):
             # Calculate aspect ratio preserving size
             img_width, img_height = pil_img.size
             display_width = int(self.screen_width * 0.6)
-            display_height = int(self.screen_height * 0.5)
+            display_height = int(self.screen_height * 0.4)
             
             # Calculate scaling factor to fit within display area while maintaining aspect ratio
             width_ratio = display_width / img_width
@@ -794,7 +794,7 @@ class GameApp(ctk.CTk):
 
         else:
             # Handle screenshot selection
-            for i, button in enumerate(self.screenshot_items):  # <-- use "button", not "frame"
+            for i, button in enumerate(self.screenshot_items):  
                 if i == self.screenshot_selected_index:
                     button.configure(fg_color="#0D6EFD",  # Vibrant blue
                     border_color="#0A58CA",
@@ -865,8 +865,6 @@ class GameApp(ctk.CTk):
             resized_overlay = overlay.resize((target_width, target_height), Image.LANCZOS)
             self._current_image_pil = resized_overlay.copy()  # Store for later fade-out
             
-            # Add subtle drop shadow and rounded corners effect
-            # (This would be approximated in PIL but actual effects would need more complex image processing)
             
             for alpha in range(0, 255 + int(255 / steps), int(255 / steps)):
                 temp_overlay = resized_overlay.copy()
@@ -1014,8 +1012,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
