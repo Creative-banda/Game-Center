@@ -16,7 +16,7 @@ screenshots_folder = current_path / 'screenshots'
 screenshots_folder.mkdir(exist_ok=True)
 
 
-# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -1012,8 +1012,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            # listener.terminate()
-            # listener.wait()
+            listener.terminate()
+            listener.wait()
             
         self.last_closing_attempt = current_time
 
