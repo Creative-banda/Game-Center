@@ -61,7 +61,7 @@ def take_screenshot():
         save_path = current_path / 'screenshots' / filename
 
         # Save the screenshot
-        subprocess.Popen(["grim", str(save_path)], check=True)
+        subprocess.run(["grim", str(save_path)], check=True)
 
         print(f"Screenshot saved as {save_path}")
         
