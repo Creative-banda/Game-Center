@@ -32,7 +32,7 @@ KEY_COMBINATIONS = {
     (6, 12, 16): ["f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_UP  → F1
     (6, 12, 20): ["shift", "f1"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_RIGHT → Shift + F1
     (6, 12, 21): ["enter"],  # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_DOWN → Return(Enter)
-    (6, 12, 26): ["ctrl"+"f"], # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_LEFT → CTRL + F
+    (6, 12, 26): ["ctrl", "f"], # LEFT_HAND_UP + LEFT_HAND_DOWN + RIGHT_HAND_LEFT → CTRL + F
     (13, 19, 16): "screenshot", # LEFT_HAND_LEFT + LEFT_HAND_RIGHT + RIGHT_HAND_UP → Screenshot
 }
 
