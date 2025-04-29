@@ -56,7 +56,7 @@ def install_libraries():
         "python3-rpi.gpio",
         "xdotool",
         "mgba-qt",
-        "gnome-screenshot",
+        "grim wayland wayland-protocols",
     ]
 
     # Install all system libraries in one command
@@ -69,7 +69,6 @@ def install_libraries():
         "keyboard",
         "pygame",
         "opencv-python",
-        "pyautogui",
         "Pillow",
     ]
 

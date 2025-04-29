@@ -1,10 +1,8 @@
 import tkinter as tk
-import time
 
-from pyautogui import screenshot
 from datetime import datetime
 from pathlib import Path
-
+import subprocess
 from pygame import mixer
 
 mixer.init()
@@ -54,8 +52,6 @@ def take_screenshot():
         # Play camera click sound
         camera_click_sound.play()
         
-        # Take full screen screenshot
-        img = screenshot()
 
         # Generate a unique filename
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -65,10 +61,10 @@ def take_screenshot():
         save_path = current_path / 'screenshots' / filename
 
         # Save the screenshot
-        img.save(save_path)
+        subprocess.Popen(["grim", str(save_path)], check=True)
+
         print(f"Screenshot saved as {save_path}")
         
-        last_screenshot = time.time()
         show_screenshot_popup()
 
 
