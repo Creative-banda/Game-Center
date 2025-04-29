@@ -16,7 +16,7 @@ screenshots_folder = current_path / 'screenshots'
 screenshots_folder.mkdir(exist_ok=True)
 
 
-listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
+# listener = subprocess.Popen(["sudo","python3",f"{current_path}/gpio_listener.py"])
 
 
 class GameApp(ctk.CTk):
@@ -73,7 +73,7 @@ class GameApp(ctk.CTk):
         self.splash_content.place(relx=0.5, rely=0.5, anchor="center")
         
         # Stylish logo
-        image_size = min(self.screen_width, self.screen_height) * 0.6
+        image_size = min(self.screen_width, self.screen_height) * 0.8
         self.logo_image = ctk.CTkImage(
             dark_image=Image.open(f"{current_path}/logo.png"),
             size=(image_size, image_size)
@@ -116,7 +116,7 @@ class GameApp(ctk.CTk):
         # Version info at the bottom corner
         self.version_label = ctk.CTkLabel(
             self.splash_frame, 
-            text="v1.0.0", 
+            text="v1.1.0", 
             font=("Orbitron", 12), 
             text_color="#555555"
         )
@@ -245,7 +245,6 @@ class GameApp(ctk.CTk):
         secondary_accent = "#8C52FF"  # Purple secondary accent
         highlight_color = "#2196F3"  # Blue highlight
         text_primary = "#FFFFFF"
-        text_secondary = "#AAAAAA"
 
         # Main Container with dark gaming background
         self.main_container = ctk.CTkFrame(self, fg_color=dark_bg, corner_radius=0)
@@ -265,7 +264,7 @@ class GameApp(ctk.CTk):
         )
         self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Content Frame - Main area with rounded corners
+        # Content Frame
         self.content_frame = ctk.CTkFrame(
             self.main_container, 
             fg_color=panel_bg, 
@@ -309,14 +308,16 @@ class GameApp(ctk.CTk):
         )
         self.games_title.place(relx=0.02, rely=0.1)
         
-        # Improved scrollable game list
+
         self.scroll_frame = ctk.CTkScrollableFrame(
             self.content_frame,
             fg_color="#151515",
             corner_radius=15,
             width=int(self.screen_width * 0.25),
             border_width=1,
-            border_color="#333333"
+            border_color="#333333",
+            scrollbar_button_color="#151515",  # Match scrollbar color to background
+            scrollbar_button_hover_color="#151515"  # Match hover color to background
         )
         self.scroll_frame.place(relx=0.02, rely=0.58, anchor="w", relwidth=0.28, relheight=0.75)
 
@@ -331,7 +332,9 @@ class GameApp(ctk.CTk):
             corner_radius=15,
             width=int(self.screen_width * 0.25),
             border_width=1,
-            border_color="#333333"
+            border_color="#333333",
+            scrollbar_button_color="#151515",  # Match scrollbar color to background
+            scrollbar_button_hover_color="#151515"  # Match hover color to background
         )
         self.screenshot_scroll_frame.place(relx=0.02, rely=0.58, anchor="w", relwidth=0.28, relheight=0.75)
         self.screenshot_scroll_frame.place_forget()  # Initially hidden
@@ -1013,8 +1016,8 @@ class GameApp(ctk.CTk):
         self.closing += 1
         if self.closing >= 10:
             self.quit() 
-            listener.terminate()
-            listener.wait()
+            # listener.terminate()
+            # listener.wait()
             
         self.last_closing_attempt = current_time
 
