@@ -73,7 +73,7 @@ class GameApp(ctk.CTk):
         self.splash_content.place(relx=0.5, rely=0.5, anchor="center")
         
         # Stylish logo
-        image_size = min(self.screen_width, self.screen_height) * 0.4
+        image_size = min(self.screen_width, self.screen_height) * 0.6
         self.logo_image = ctk.CTkImage(
             dark_image=Image.open(f"{current_path}/logo.png"),
             size=(image_size, image_size)
@@ -87,7 +87,7 @@ class GameApp(ctk.CTk):
         self.title_label = ctk.CTkLabel(
             self.splash_content, 
             text="GAME CENTER", 
-            font=("Orbitron", 32, "bold"), 
+            font=("Orbitron", 28, "bold"), 
             text_color="#00CCFF"
         )
         self.title_label.pack(pady=(5, 25))
