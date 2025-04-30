@@ -8,7 +8,7 @@ from pathlib import Path
 
 mixer.init()
 
-current_path = Path(__file__).parent.resolve()
+current_path = Path(__file__).parent.parent.resolve()
 
 camera_click_sound = mixer.Sound(f"{current_path}/sounds/camera_click.mp3")
 
@@ -29,7 +29,6 @@ def get_display_env():
     env["XDG_RUNTIME_DIR"] = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 
     return env, actual_user
-
 
 
 def get_env_for_screenshot():
