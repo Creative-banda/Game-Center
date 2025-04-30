@@ -4,9 +4,12 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 from pygame import mixer
+from utils.env_utils import get_display_env
 
 mixer.init()
 
+
+env, _ = get_display_env()
 
 
 current_path = Path(__file__).parent.resolve()
@@ -63,7 +66,7 @@ def take_screenshot():
         save_path = current_path / 'screenshots' / filename
 
         # Save the screenshot
-        subprocess.run(["grim", str(save_path)])
+        subprocess.run(["grim", str(save_path)], env=env)
 
         print(f"Screenshot saved as {save_path}")
         
