@@ -7,13 +7,24 @@ import subprocess
 from pathlib import Path
 
 
+# --- Setup ---# Set the environment variables for GUI applications
+def get_display_env():
+    env = os.environ.copy()
+    
+    # Get the actual desktop user, even when running via sudo
+    actual_user = os.getenv("SUDO_USER") or getpass.getuser()
+    home_dir = os.path.expanduser(f"~{actual_user}")
 
-env = os.environ.copy()
+    env["DISPLAY"] = os.environ.get("DISPLAY", ":0")
+    env["XAUTHORITY"] = os.environ.get("XAUTHORITY", f"{home_dir}/.Xauthority")
+    env["USER"] = actual_user
+    env["HOME"] = home_dir
+    env["XDG_RUNTIME_DIR"] = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
 
-# Set specific variables for the normal user (force normal user environment)
-env['USER'] = getpass.getuser()  # Set the normal user name
-env['HOME'] = os.path.expanduser('~')  # Set home directory for the normal user
-env['XDG_RUNTIME_DIR'] = os.environ.get('XDG_RUNTIME_DIR', '/run/user/1000')  # Ensure display access
+    return env
+
+
+env = get_display_env()
 
 
 # Get the current script's directory
