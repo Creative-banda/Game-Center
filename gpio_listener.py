@@ -2,13 +2,18 @@
 
 
 import RPi.GPIO as GPIO
-import time, os
-import keyboard  # To simulate keypress events
-
-from threading import Thread
-from show_shutdown_overlay import show_shutdown
+import time, os, getpass, keyboard
 import subprocess
 from pathlib import Path
+
+
+
+env = os.environ.copy()
+
+# Set specific variables for the normal user (force normal user environment)
+env['USER'] = getpass.getuser()  # Set the normal user name
+env['HOME'] = os.path.expanduser('~')  # Set home directory for the normal user
+env['XDG_RUNTIME_DIR'] = os.environ.get('XDG_RUNTIME_DIR', '/run/user/1000')  # Ensure display access
 
 
 # Get the current script's directory
@@ -71,7 +76,7 @@ def gpio_listener():
                     print("Shutdown button held for 3 seconds. Shutting down...")
                     shutdown_triggered = True
                     try:
-                        Thread(target=show_shutdown).start()
+                        subprocess.Popen(["python3", f"{current_path}/show_shutdown_overlay.py"], env=env)
                         os.system("xdotool search --name 'Shutting Down' windowactivate")
                     except Exception as e:
                         print(f"Error starting shutdown overlay: {e}")
@@ -93,7 +98,7 @@ def gpio_listener():
                         if output == "screenshot":         
                             if time.time() - last_screenshot > 1:
                                 print("Screenshot combination detected! 📸")
-                                subprocess.Popen(["python3",f"{current_path}/screen_shot_layout.py"])
+                                subprocess.Popen(["python3", f"{current_path}/screen_shot_layout.py"], env=env)
                                 last_screenshot = time.time()
                         
                         else:
