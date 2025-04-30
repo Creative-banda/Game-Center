@@ -3,19 +3,15 @@ import tkinter as tk
 from datetime import datetime
 from pathlib import Path
 import subprocess
-from pygame import mixer
 from utils.env_utils import get_display_env
 
 
-mixer.init()
 
 
 env, _ = get_display_env()
 
 
-current_path = Path(__file__).parent.resolve()
 
-camera_click_sound = mixer.Sound(f"{current_path}/sounds/camera_click.mp3")
 
 def show_screenshot_popup():
     popup = tk.Tk()
@@ -52,27 +48,6 @@ def show_screenshot_popup():
 
     popup.mainloop()
 
-
-def take_screenshot():
         
-        # Play camera click sound
-        camera_click_sound.play()
-        
-
-        # Generate a unique filename
-        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        filename = f'screenshot_{timestamp}.png'
-
-        # Full path where screenshot will be saved
-        save_path = current_path / 'screenshots' / filename
-
-        # Save the screenshot
-        subprocess.run(["grim", str(save_path)], env=env)
-
-        print(f"Screenshot saved as {save_path}")
-        
-        show_screenshot_popup()
-
-
 if __name__ == "__main__":
-    take_screenshot()
+    show_screenshot_popup()
