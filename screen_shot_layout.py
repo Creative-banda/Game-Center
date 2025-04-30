@@ -26,6 +26,7 @@ def show_screenshot_popup():
     popup = tk.Tk()
     popup.overrideredirect(True)  # Remove window border
     popup.attributes("-topmost", True)
+    popup.title("Screenshot Notification")
     popup.configure(bg="#101010")  # Background color
 
     # --- Popup Size ---
@@ -77,6 +78,7 @@ def take_screenshot():
         print(f"Screenshot saved as {save_path}")
         
         show_screenshot_popup()
+        os.system("xdotool search --name 'Game Center' windowactivate")
 
 
 if __name__ == "__main__":

@@ -93,6 +93,7 @@ def gpio_listener():
                             if time.time() - last_screenshot > 1:
                                 print("Screenshot combination detected! 📸")
                                 subprocess.Popen(["python3",f"{current_path}/screen_shot_layout.py"])
+                                os.system("xdotool search --name 'Screenshot Notification' windowactivate")
                                 last_screenshot = time.time()
                         
                         else:
