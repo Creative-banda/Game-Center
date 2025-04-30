@@ -73,4 +73,7 @@ def show_shutdown():
 
 if __name__ == "__main__":
     # Show the shutdown overlay
-    show_shutdown()
+    try:
+        show_shutdown()
+    except:
+        os.system("sudo shutdown now")
