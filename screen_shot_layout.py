@@ -1,16 +1,9 @@
 import tkinter as tk
 
-from datetime import datetime
-from pathlib import Path
-import subprocess
 from utils.env_utils import get_display_env
 
 
-
-
 env, _ = get_display_env()
-
-
 
 
 def show_screenshot_popup():

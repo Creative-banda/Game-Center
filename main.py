@@ -5,10 +5,8 @@ import time
 import threading
 import socket
 
-from pathlib import Path
+from utils.env_utils import current_path
 
-
-current_path = Path(__file__).parent.resolve()
 
 screenshots_folder = current_path / 'screenshots'
 
@@ -207,18 +205,38 @@ class GameApp(ctk.CTk):
         """Pull the latest changes from the GitHub repository and restart if necessary."""
         try:
             result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
-            
+
             if "Already up to date." in result.stdout:
                 self.status_label.configure(text="SYSTEM UP TO DATE")
-            else:
+
+            elif "Please commit" in result.stderr or "Your local changes" in result.stderr:
+                self.status_label.configure(text="RESETTING LOCAL CHANGES")
+                # Forcefully discard local changes
+                subprocess.run(["git", "reset", "--hard"], cwd=self.repo_path)
+                # Try pulling again
+                retry_result = subprocess.run(["git", "pull"], cwd=self.repo_path, capture_output=True, text=True)
+
+                if "Already up to date." in retry_result.stdout or "Updating" in retry_result.stdout:
+                    self.status_label.configure(text="UPDATE COMPLETE - RESTARTING")
+                    time.sleep(2)
+                    self.quit()
+                else:
+                    self.status_label.configure(text="UPDATE ERROR")
+                    print("Git pull failed after reset:", retry_result.stderr)
+
+            elif "Updating" in result.stdout:
                 self.status_label.configure(text="UPDATE COMPLETE - RESTARTING")
                 time.sleep(2)
-                # Close the current application, startup script will run the new version
                 self.quit()
+
+            else:
+                self.status_label.configure(text="UPDATE ERROR")
+                print("Git pull failed:", result.stderr)
 
         except Exception as e:
             self.status_label.configure(text="UPDATE ERROR")
-            print("Error updating repository:", str(e))
+            print("Exception while updating repository:", str(e))
+
 
     def transition_to_main_ui(self):
         # Clean up splash screen

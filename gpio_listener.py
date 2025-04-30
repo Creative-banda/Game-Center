@@ -5,59 +5,16 @@ import RPi.GPIO as GPIO
 import time, os, getpass, keyboard
 import subprocess
 from pathlib import Path
-from pygame import mixer
-from datetime import datetime
 
-
-
-mixer.init()
-
-current_path = Path(__file__).parent.resolve()
-
-camera_click_sound = mixer.Sound(f"{current_path}/sounds/camera_click.mp3")
-
-
-from utils.env_utils import get_display_env
-
+from utils.env_utils import get_display_env, get_env_for_screenshot, take_screenshot
 
 env, _ = get_display_env()
 
 
-
-def get_env_for_screenshot():
-    env = os.environ.copy()
-
-    # Set specific variables for the normal user (force normal user environment)
-    env['USER'] = getpass.getuser()  # Set the normal user name
-    env['HOME'] = os.path.expanduser('~')  # Set home directory for the normal user
-    env['XDG_RUNTIME_DIR'] = os.environ.get('XDG_RUNTIME_DIR', '/run/user/1000')  # Ensure display access
-
-    return env
-
-
-def take_screenshot():
-        
-        # Play camera click sound
-        camera_click_sound.play()
-        
-        # Generate a unique filename
-        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        filename = f'screenshot_{timestamp}.png'
-
-        # Full path where screenshot will be saved
-        save_path = current_path / 'screenshots' / filename
-
-        # Save the screenshot
-        subprocess.run(["grim", str(save_path)], env=screenshot_env)
-
-        print(f"Screenshot saved as {save_path}")
-
-
+screenshot_env = get_env_for_screenshot()
 
 # Get the current script's directory
 current_path = Path(__file__).parent.resolve()
-
-screenshot_env = get_env_for_screenshot()
 
 # Define GPIO pin mappings
 PIN_MAPPING = {
@@ -139,7 +96,7 @@ def gpio_listener():
                             if time.time() - last_screenshot > 1:
                                 print("Screenshot combination detected! 📸")
                                 subprocess.Popen(["python3", f"{current_path}/screen_shot_layout.py"], env=env)
-                                take_screenshot()
+                                take_screenshot(screenshot_env)
                                 last_screenshot = time.time()
                         
                         else:
