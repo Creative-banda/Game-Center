@@ -25,7 +25,6 @@ class GameApp(ctk.CTk):
         self.configure(fg_color="black")
         self.configure(cursor="none")  # Hide mouse cursor
         self.protocol("WM_DELETE_WINDOW", lambda: None)
-        self.transitioning = False
         self.last_select_item = time.time()
 
 
@@ -1039,9 +1038,6 @@ class GameApp(ctk.CTk):
             
         self.last_closing_attempt = current_time
 
-    def on_close(self):
-        self.transitioning = True
-        self.quit()
 
 class GameButton(ctk.CTkButton):
     def __init__(self, *args, **kwargs): 
