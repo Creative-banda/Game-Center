@@ -6,7 +6,6 @@ def show_shutdown():
     root.title("Shutting Down")
     root.overrideredirect(True)
     root.wm_attributes("-topmost", True)
-    root.wm_attributes("-transparentcolor", "#101010")
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
