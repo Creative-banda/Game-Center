@@ -140,6 +140,14 @@ sudo apt install mgba-qt
 sudo apt install xdotool -y
 ```
 
+#### Install grim (For Taking Screenshots)
+
+`grim` is a lightweight screenshot utility used in Game Center to capture and save screenshots of the application or games. It's especially useful for logging or sharing gameplay moments.
+
+```
+sudo apt install grim -y
+```
+
 ---
 
 🖼️ Font Installation (Orbitron)
