@@ -63,16 +63,24 @@ git reset --hard
 
 ### 🔧 Easy Installation Script(Automated)
 To make the setup process easier, we've created an automated Python script that installs all required libraries and dependencies for Game Center. Instead of installing each package manually, simply run the script and let it handle everything for you. This ensures a smooth and hassle-free installation experience.
-```bash
+
+```
 python3 install_dependencies.py
 ```
 
-### 3. System Preparation (Manual)
-#### Update System Packages
-Ensure your Raspberry Pi's system packages are up to date:
+### 3. 🧰 Manual Setup (Advanced Users)
+--------------------------------
+
+If you prefer manual installation:
+
+### 📦 System Preparation
+
 ```bash
-sudo apt update && sudo apt upgrade -y
+sudo apt update
+sudo python3 -m pip install --upgrade pip
 ```
+
+### 📚 Required Libraries
 
 #### Install Python & Pip
 Check your current Python version:
@@ -134,14 +142,35 @@ sudo apt install xdotool -y
 
 ---
 
-### 5. Set Up Auto-Launch on Startup
-Create a systemd service to launch Game Center automatically:
+🖼️ Font Installation (Orbitron)
+--------------------------------
+Replace `PATH` with your actual path of Game Center Path.
+
+```
+cd <PATH>
+sudo mkdir -p /usr/share/fonts/truetype/orbitron
+sudo cp fonts/Orbitron.ttf /usr/share/fonts/truetype/orbitron/
+sudo fc-cache -f -v
+```
+
+* * * * *
+
+🔄 Auto-Start on Boot (Service Setup)
+-------------------------------------
+
+Automatically launches Game Center on boot via `systemd`.
+
+### Create the service file:
+
+
 ```bash
 sudo nano /etc/systemd/system/gamecenter.service
 ```
-Paste the following configuration (replace `<USER>` with your Raspberry Pi username and `<PATH>` with the full path to the Game Center folder):
-```
-[Unit]
+
+Paste and update the following (replace `<USER>` and `<PATH>`):
+
+
+```[Unit]
 Description=Game Center GUI Application
 After=multi-user.target
 
@@ -154,34 +183,80 @@ Environment=DISPLAY=:0
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target`
 ```
-Save the file and enable the service:
-```bash
+
+Enable and start the service:
+
+```
 sudo systemctl enable gamecenter.service
-sudo systemctl start gamecenter.service
+sudo systemctl start gamecenter.service`
 ```
-Check service status:
-```bash
+Check status:
+```
 sudo systemctl status gamecenter.service
 ```
-Restart your Raspberry Pi to verify auto-launch:
-```bash
+
+* * * * *
+
+🔁 Reboot
+---------
+
+After setup, reboot to verify auto-launch:
+
+```
 sudo reboot
 ```
 
-If you cloned the repository into a new directory, remember to update `<PATH>` in the service file accordingly.
+* * * * *
 
----
+🧯 Troubleshooting
+------------------
 
+### 🖼️ Pillow / ImageTk Errors
 
----
-
-### 6. Troubleshooting Common Issues
-#### ImageTk Not Found (PIL Issue)
-If you encounter an error related to ImageTk from PIL, try:
-```bash
-sudo apt install --reinstall python3-pil python3-tk
-pip install --break-system-packages --upgrade --force-reinstall pillow
+```sudo apt install --reinstall python3-pil python3-tk
+pip3 install --break-system-packages --upgrade --force-reinstall pillow
 ```
 
+### ❌ Service not launching?
+
+Check logs:
+
+```
+sudo systemctl status gamecenter.service
+```
+
+* * * * *
+
+🧪 Verifying Installation
+-------------------------
+
+Check that key packages are available:
+
+```
+import pygame, customtkinter, RPi.GPIO, keyboard
+```
+
+* * * * *
+
+📢 Need Help?
+-------------
+
+-   Double-check paths and permissions
+
+-   Make sure you're running Python 3
+
+-   For bugs or issues, check logs or re-run the installer
+
+* * * * *
+
+💡 Pro Tip
+----------
+
+Want to update Game Center later?
+
+```
+cd <REPO_FOLDER>
+git pull
+```
