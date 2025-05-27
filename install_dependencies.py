@@ -19,14 +19,23 @@ def setup_user_and_path():
     print(f"Detected path: {path}")
 
 # Function to execute commands and check for success
+import subprocess
+import sys
+
 def run_command(command):
     try:
-        print(f"Running command: {command}") 
-        subprocess.check_call(command, shell=True)
+        print(f"Running command: {command}")
+        subprocess.check_call(
+            command,
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
     except subprocess.CalledProcessError as e:
-        print(f"Error occurred while executing: {command}")
-        print(e)
+        print(f"❌ Error occurred while executing: {command}")
+        print(f"🔍 {e}")
         sys.exit(1)
+
 
 # Updating system packages
 def update_system():
@@ -59,7 +68,6 @@ def install_libraries():
         "grim",
     ]
 
-    # Install all system libraries in one command
     run_command(f"sudo apt install {' '.join(system_libraries)} -y")
 
     print("Installing required Python pip packages...")
@@ -72,7 +80,6 @@ def install_libraries():
         "Pillow",
     ]
 
-    # Install all pip packages in one command
     run_command(f"sudo pip3 install {' '.join(pip_packages)} --break-system-packages")
 
 
@@ -146,6 +153,54 @@ def install_font():
         print("   🛠️  Double-check the font path and try again.")  
     print("Font installation complete! 🎨")
 
+# Setting up display mirroring for HDMI-1
+def setup_display_mirroring():
+    print("📺 Setting up HDMI-1 as the primary display...")
+
+    # Step 1: Create the display script
+    display_script = """#!/bin/bash
+        xrandr --output HDMI-1 --mode 800x480 --primary
+        xrandr --output HDMI-2 --off
+    """
+
+    try:
+        script_path = "/usr/local/bin/set-primary-display.sh"
+        with open("set-primary-display.sh", "w") as f:
+            f.write(display_script)
+
+        run_command(f"sudo mv set-primary-display.sh {script_path}")
+        run_command(f"sudo chmod +x {script_path}")
+        print("✅ Display control script created and made executable.")
+
+        # Step 2: Create the systemd service file
+        display_service = f"""[Unit]
+Description=Force HDMI-1 as primary display
+After=graphical.target
+
+[Service]
+ExecStart={script_path}
+Type=oneshot
+User={user}
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/{user}/.Xauthority
+
+[Install]
+WantedBy=graphical.target
+"""
+        with open("set-primary-display.service", "w") as f:
+            f.write(display_service)
+
+        run_command("sudo mv set-primary-display.service /etc/systemd/system/set-primary-display.service")
+        run_command("sudo systemctl enable set-primary-display.service")
+        print("✅ Display service installed and enabled!")
+
+    except Exception as e:
+        print("\n❌ Failed to set up display mirroring:")
+        print(f"   🔍 Error: {e}")
+        print("   🛠️  Double-check paths and permissions, then try again.")
+
+
+
 # Verifying installation
 def verify_installation():
     print("🔍 Checking if all libraries are installed...")  
@@ -175,6 +230,7 @@ def main():
     install_libraries()
     trouble_shooting()
     create_service()
+    setup_display_mirroring()
     verify_installation()
     install_font()
     reboot_system()
