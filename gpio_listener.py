@@ -24,7 +24,7 @@ PIN_MAPPING = {
     19: ["d", "right"],  # LEFT_HAND_RIGHT → D + RIGHT
     16: ["space"],  # RIGHT_HAND_UP → SPACEBAR
     26: ["q"],  # RIGHT_HAND_LEFT → Q
-    20: ["f"],  # RIGHT_HAND_RIGHT → F
+    0: ["f"],  # RIGHT_HAND_RIGHT → F
     21: ["p"],  # RIGHT_HAND_DOWN → P
     5: ["alt", "f4"]  # TOP_BUTTON → ALT + F4
 }
