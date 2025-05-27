@@ -103,6 +103,11 @@ def create_service():
     [Service]
     User={user}
     Group={user}
+    RestartSec=2
+    TimeoutStopSec=2
+    KillSignal=SIGKILL
+    SendSIGKILL=yes
+    KillMode=control-group
     WorkingDirectory={path}
     ExecStart=/usr/bin/python3 {path}/main.py
     Environment=DISPLAY=:0
