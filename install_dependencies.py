@@ -104,25 +104,29 @@ def create_service():
     global user, path
 
     service_content = f"""[Unit]
-    Description=Game Center GUI Application
-    After=multi-user.target
+        Description=Game Center GUI Application
+        After=graphical.target multi-user.target user@1000.service
+        Wants=graphical.target user@1000.service
 
-    [Service]
-    User={user}
-    Group={user}
-    RestartSec=2
-    TimeoutStopSec=2
-    KillSignal=SIGKILL
-    SendSIGKILL=yes
-    KillMode=control-group
-    WorkingDirectory={path}
-    ExecStart=/usr/bin/python3 {path}/main.py
-    Environment=DISPLAY=:0
-    Restart=always
+        [Service]
+        User={user}
+        Group={user}
+        RestartSec=2
+        TimeoutStopSec=2
+        KillSignal=SIGKILL
+        SendSIGKILL=yes
+        KillMode=control-group
+        WorkingDirectory={path}
+        ExecStart=/usr/bin/python3 {path}/main.py
+        Environment=DISPLAY=:0
+        Environment=XDG_RUNTIME_DIR=/run/user/1000
+        Environment=XAUTHORITY=/home/{user}/.Xauthority
+        Environment=PULSE_SERVER=/run/user/1000/pulse/native
+        Restart=always
 
-    [Install]
-    WantedBy=multi-user.target
-    """
+        [Install]
+        WantedBy=multi-user.target
+        """
 
     try:
         # Save to a temporary file
