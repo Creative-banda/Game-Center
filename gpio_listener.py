@@ -26,7 +26,7 @@ PIN_MAPPING = {
     26: ["q"],  # RIGHT_HAND_LEFT → Q
     20: ["f"],  # RIGHT_HAND_RIGHT → F
     21: ["p"],  # RIGHT_HAND_DOWN → P
-    5: ["alt", "f4"]  # TOP_BUTTON → ALT + F4
+    5: ["alt", "f4", "esc"]  # TOP_BUTTON → ALT + F4
 }
 
 # Define special key combinations
