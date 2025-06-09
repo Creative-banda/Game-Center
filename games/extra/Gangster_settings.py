@@ -14,7 +14,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_desktop_sizes()[0]
 scale_x = SCREEN_WIDTH / VIRTUAL_WIDTH
 scale_y = SCREEN_HEIGHT / VIRTUAL_HEIGHT
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
 
 # Constants
 BULLET_SIZE = (10 * scale_x, 5 * scale_y)
