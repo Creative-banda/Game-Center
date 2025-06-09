@@ -31,6 +31,17 @@ class Player(pygame.sprite.Sprite):
         self.sprint_value = 200
         self.last_sprint_update = pygame.time.get_ticks()
         self.isActive = True
+
+        # Double-click movement attributes
+        self.double_click_time = 300  # milliseconds to detect double-click
+        self.run_duration = 2000      # how long to keep running after double-click (ms)
+        self.last_a_time = 0
+        self.last_d_time = 0
+        self.a_pressed = False
+        self.d_pressed = False
+        self.is_running_left = False
+        self.is_running_right = False
+        self.running_start_time = 0
     
         self.bullet_info = copy.deepcopy(BULLET_INFO) # Copy the dictionary to avoid modifying the original dictionary
 
@@ -80,7 +91,6 @@ class Player(pygame.sprite.Sprite):
 
             self.animations[action] = frames
 
-
     def move(self, ground_group):
         if not self.isActive:
             return 0, 0
@@ -123,26 +133,74 @@ class Player(pygame.sprite.Sprite):
                 pygame.mixer.Sound(f"{CURRENT_PATH}/assets/sfx/{sound}.mp3").play()
 
 
-        # Allow horizontal movement even while in the air
+        # Handle horizontal movement with double-click running
         if (keys[pygame.K_a] or keys[pygame.K_d]) and (not self.isReloading) and self.alive:
+            current_time = pygame.time.get_ticks()
+            
             if keys[pygame.K_a]:
+                # Check for double-click on A key
+                if not self.a_pressed:  # Key just pressed
+                    self.a_pressed = True
+                    if current_time - self.last_a_time < self.double_click_time:
+                        self.is_running_left = True
+                        self.running_start_time = current_time
+                    self.last_a_time = current_time
+                
                 dx = -self.speed
                 self.direction = -1
+                
+                # Check if we should stop running (timeout)
+                if self.is_running_left and current_time - self.running_start_time > self.run_duration:
+                    self.is_running_left = False
+                    
             elif keys[pygame.K_d]:
+                # Check for double-click on D key
+                if not self.d_pressed:  # Key just pressed
+                    self.d_pressed = True
+                    if current_time - self.last_d_time < self.double_click_time:
+                        self.is_running_right = True
+                        self.running_start_time = current_time
+                    self.last_d_time = current_time
+                
                 dx = self.speed
                 self.direction = 1
+                
+                # Check if we should stop running (timeout)
+                if self.is_running_right and current_time - self.running_start_time > self.run_duration:
+                    self.is_running_right = False
 
+            # Apply running speed and set animation
             if not self.InAir and not self.isReloading and not self.isShooting and self.alive:
-                if keys[pygame.K_LSHIFT] and self.sprint_value > 0:
-                    self.sprint_value -= 1
-                    dx *= 3 
-                    new_action = "Run"
+                if (self.is_running_left and keys[pygame.K_a]) or (self.is_running_right and keys[pygame.K_d]):
+                    if self.sprint_value > 0:
+                        self.sprint_value -= 1
+                        dx *= 3
+                        new_action = "Run"
+                    else:
+                        new_action = "Walk"
                 else:
                     new_action = "Walk"
+
+
+        # Reset key pressed states when keys are released
+        if not keys[pygame.K_a]:
+            self.a_pressed = False
+            if not keys[pygame.K_d]:  # Only stop running left if D is also not pressed
+                self.is_running_left = False
+
+        if not keys[pygame.K_d]:
+            self.d_pressed = False
+            if not keys[pygame.K_a]:  # Only stop running right if A is also not pressed
+                self.is_running_right = False
+
+        # Handle idle animation when not moving
+        if not (keys[pygame.K_a] or keys[pygame.K_d]) and not self.InAir and not self.isReloading and not self.isShooting and self.alive:
+            new_action = "idle"
             
+                    
 
         # Handle Shooting
-        elif keys[pygame.K_SPACE] and not self.isReloading and not self.isShooting and self.alive:
+        if keys[pygame.K_SPACE] and not self.isReloading and not self.isShooting and self.alive:
             if self.bullet_info[self.current_gun]["remaining"] != 0:
                 new_action = "Shot"
                 self.shoot()
@@ -227,7 +285,6 @@ class Player(pygame.sprite.Sprite):
 
         return screen_dx, screen_dy
 
-
     def update(self):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_update_time > PLAYER_ANIMATION[self.current_action]["animation_cooldown"]:
@@ -255,7 +312,6 @@ class Player(pygame.sprite.Sprite):
             self.image = self.animations[self.current_action][len(self.animations[self.current_action])-1]
         self.image = pygame.transform.flip(self.image, self.direction == -1, False)
 
-
     def reload(self):
         if self.isReloading or self.bullet_info[self.current_gun]["remaining"] == self.bullet_info[self.current_gun]["mag_size"] or self.bullet_info[self.current_gun]["total"] == 0:
             return
@@ -272,7 +328,6 @@ class Player(pygame.sprite.Sprite):
         else:
             self.bullet_info[self.current_gun]["total"] -= (self.bullet_info[self.current_gun]["mag_size"] - self.bullet_info[self.current_gun]["remaining"])
             self.bullet_info[self.current_gun]["remaining"] = self.bullet_info[self.current_gun]["mag_size"]
-
 
     def shoot(self):
         if pygame.time.get_ticks() - self.last_bullet_time < BULLET_INFO[self.current_gun]['cooldown'] or self.isReloading:
@@ -302,7 +357,6 @@ class Player(pygame.sprite.Sprite):
         self.last_bullet_time = pygame.time.get_ticks()
         self.bullet_info[self.current_gun]["remaining"] -= 1
 
-
     def update_animation(self, new_action):
         if new_action != self.current_action:
             self.current_action = new_action
@@ -311,14 +365,12 @@ class Player(pygame.sprite.Sprite):
             if new_action == "idle":
                 self.isShooting = False
 
-
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         
 
         # display the collision bar
         # pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
-
 
     def update_size(self, ZOOM_VALUE):
         self.zoom_value = ZOOM_VALUE
@@ -327,7 +379,6 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.current_action][self.frame_index]
         self.rect = self.image.get_rect()
 
- 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, damage, ZOOM_VALUE):
         super().__init__()

@@ -232,7 +232,7 @@ def main():
                 last_gun_change = pygame.time.get_ticks()
 
                 if player.current_gun == "handgun":
-                    if player.isRifle:
+                    if player.isRifle:  
                         player.current_gun = "rifle"
                     elif player.isShotgun:
                         player.current_gun = "shotgun"
