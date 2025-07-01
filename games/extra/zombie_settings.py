@@ -83,12 +83,25 @@ dead_zombie_image = pygame.transform.scale(dead_zombie_image, (ZOMBIE_SIZE, ZOMB
 
 # Sound Files
 gun_pickup_sound = pygame.mixer.Sound(SOUNDS_DIR / "gun_pickup.mp3")
+gun_pickup_sound.set_volume(0.5)
+
 item_pickup_sound = pygame.mixer.Sound(SOUNDS_DIR / "collect_item.mp3")
+item_pickup_sound.set_volume(0.5)
+
 death_sound = pygame.mixer.Sound(SOUNDS_DIR / "death.mp3")
+death_sound.set_volume(0.5)
+
 victory_sound = pygame.mixer.Sound(SOUNDS_DIR / "victory_sound.mp3")
+victory_sound.set_volume(0.5)
+
 loose_sound = pygame.mixer.Sound(SOUNDS_DIR / "loose.mp3")
+loose_sound.set_volume(0.5)
+
 walk_sound = pygame.mixer.Sound(SOUNDS_DIR / 'player_walk.mp3')
+walk_sound.set_volume(0.5)
+
 background_music = pygame.mixer.Sound(f"{SOUNDS_DIR / 'background_music.mp3'}")
+background_music.set_volume(0.5)
 
 
 # Player Gun Info
