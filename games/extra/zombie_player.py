@@ -146,7 +146,9 @@ class Player():
 
     def shoot(self):
         if self.gun_info[self.current_gun]["remaining_ammo"] <= 0 and pygame.time.get_ticks() - self.animation_cool_down > 500:
-            pygame.mixer.Sound(SOUNDS_DIR / 'gun_sound' / 'empty_gun.mp3').play()
+            empty_sound = pygame.mixer.Sound(SOUNDS_DIR / 'gun_sound' / 'empty_gun.mp3')
+            empty_sound.set_volume(0.5)
+            empty_sound.play()
 
             self.animation_cool_down = pygame.time.get_ticks()
             return
@@ -155,7 +157,9 @@ class Player():
             if pygame.time.get_ticks() - self.animation_cool_down > self.gun_info[self.current_gun]["cooldown"]:
                 self.update_action(3)  # Shoot animation
                 self.animation_cool_down = pygame.time.get_ticks()
-                pygame.mixer.Sound(self.gun_info[self.current_gun]['sound']).play()
+                sound = pygame.mixer.Sound(self.gun_info[self.current_gun]['sound'])
+                sound.set_volume(0.5)
+                sound.play()
 
 
                 # Calculate bullet direction
@@ -201,7 +205,9 @@ class Player():
         if (self.gun_info[self.current_gun]['remaining_ammo'] == self.gun_info[self.current_gun]['magazine']  or self.isReloading or self.gun_info[self.current_gun]['ammo'] <= 0):
             return
         self.update_action(2)  # Reload animation
-        pygame.mixer.Sound(self.gun_info[self.current_gun]['reloading_sound']).play()
+        reload_sound = pygame.mixer.Sound(self.gun_info[self.current_gun]['reloading_sound'])
+        reload_sound.set_volume(0.5)
+        reload_sound.play()
         self.isReloading = True  # Prevent actions while reloading
         self.can_shoot = False  # Prevent shooting during reload
         
@@ -258,7 +264,9 @@ class Player():
                         random_sound = ['zombie_die1', 'zombie_die2', 'zombie_die3']
                         sound = random.choice(random_sound)
                         sound = SOUNDS_DIR / "zombie_die" / (sound + ".mp3")
-                        pygame.mixer.Sound(sound).play()
+                        death_sound = pygame.mixer.Sound(sound)
+                        death_sound.set_volume(0.5)
+                        death_sound.play()
                         zombies.remove(zombie)  # Remove the zombie
                     bullets_to_remove.append(bullet)  # Remove the bullet
                     break
