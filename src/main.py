@@ -476,11 +476,13 @@ class MainUI(ctk.CTkFrame):
                     image_width = int(self.master.winfo_screenwidth() * 0.6)
                     image_height = int(self.master.winfo_screenheight() * 0.4)
 
-                    threading.Thread(
-                        target=self.fade_image,
-                        args=(image_path, image_width, image_height),
-                        daemon=True
-                    ).start()
+                    print(f"Loading image from: {image_path}")
+                    try:
+                        img = Image.open(image_path)
+                        ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(image_width, image_height))
+                        self.image_label.configure(image=ctk_img)
+                    except FileNotFoundError:
+                        self.image_label.configure(image=None, text="Image not found")
 
                     text = self.read_txt(game_name)
                     self.desc_label.configure(
@@ -546,60 +548,6 @@ class MainUI(ctk.CTkFrame):
         
         step(1)
 
-    def fade_image(self, new_image_path, target_width, target_height):
-        try:
-            steps = 5
-            
-            if hasattr(self.image_label, 'image') and self.image_label.image:
-                for alpha in range(255, 0, -int(255 / steps)):
-                    if hasattr(self, '_current_image_pil'):
-                        temp_overlay = self._current_image_pil.copy()
-                        temp_overlay.putalpha(alpha)
-                        temp_image = ImageTk.PhotoImage(temp_overlay)
-                        self.image_label.configure(image=temp_image)
-                        self.image_label.image = temp_image
-                        self.update()
-                        time.sleep(0.015)
-            
-            time.sleep(0.05)
-            
-            overlay = Image.open(new_image_path).convert("RGBA")
-            resized_overlay = overlay.resize((target_width, target_height), Image.LANCZOS)
-            self._current_image_pil = resized_overlay.copy()
-            
-            
-            for alpha in range(0, 255 + int(255 / steps), int(255 / steps)):
-                temp_overlay = resized_overlay.copy()
-                temp_overlay.putalpha(alpha)
-
-                temp_image = ImageTk.PhotoImage(temp_overlay)
-                self.image_label.configure(image=temp_image)
-                self.image_label.image = temp_image
-                self.update()
-                time.sleep(0.015)
-
-            final_image_tk = ImageTk.PhotoImage(resized_overlay)
-            self.image_label.configure(image=final_image_tk)
-            self.image_label.image = final_image_tk
-
-        except FileNotFoundError:
-            self.image_label.configure(image=None)
-            no_image_frame = ctk.CTkFrame(
-                self.image_label, 
-                fg_color="#222222", 
-                corner_radius=15,
-                width=target_width,
-                height=target_height
-            )
-            no_image_frame.place(relx=0.5, rely=0.5, anchor="center")
-            
-            no_image_label = ctk.CTkLabel(
-                no_image_frame,
-                text="No Image Available",
-                font=("Orbitron", 24, "bold"),
-                text_color="#555555"
-            )
-            no_image_label.place(relx=0.5, rely=0.5, anchor="center")
 
     def move_up(self, event):
         if self.current_tab == "GAMES":
