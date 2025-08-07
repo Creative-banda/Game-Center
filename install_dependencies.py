@@ -117,7 +117,7 @@ def create_service():
         SendSIGKILL=yes
         KillMode=control-group
         WorkingDirectory={path}
-        ExecStart=/usr/bin/python3 {path}/main.py
+        ExecStart=/usr/bin/python3 {path}/src/main.py
         Environment=DISPLAY=:0
         Environment=XDG_RUNTIME_DIR=/run/user/1000
         Environment=XAUTHORITY=/home/{user}/.Xauthority
@@ -150,7 +150,7 @@ def install_font():
     print(" ****** Installing custom font...")
     try:
         run_command("sudo mkdir -p /usr/share/fonts/truetype/orbitron")
-        run_command(f"sudo cp {path}/fonts/Orbitron.ttf /usr/share/fonts/truetype/orbitron/")
+        run_command(f"sudo cp {path}/assets/fonts/Orbitron.ttf /usr/share/fonts/truetype/orbitron/")
         run_command("sudo fc-cache -f -v")
     except Exception as e:
         print(f"\n❌ Oops! Font installation failed: {e}")  

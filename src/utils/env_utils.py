@@ -7,9 +7,9 @@ from pathlib import Path
 
 mixer.init()
 
-current_path = Path(__file__).parent.parent.resolve()
+current_path = Path(__file__).parent.parent.parent.resolve()
 
-camera_click_sound = mixer.Sound(f"{current_path}/sounds/camera_click.mp3")
+camera_click_sound = mixer.Sound(f"{current_path}/assets/sounds/camera_click.mp3")
 
 def get_actual_user():
     return os.getenv("SUDO_USER") or getpass.getuser()
