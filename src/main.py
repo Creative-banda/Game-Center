@@ -4,15 +4,17 @@ import os, subprocess
 import time
 import threading
 import socket
+import pygame
 
 from utils.env_utils import current_path
-from widgets import GameButton
+from widgets import GameButton, AnimatedBackground
 from splash import SplashScreen
 
 class MainUI(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master, fg_color="#121212")
+    def __init__(self, master, sounds):
+        super().__init__(master, fg_color="transparent")
         self.master = master
+        self.sounds = sounds
         self.pack(fill="both", expand=True)
 
         # Theme colors
@@ -24,7 +26,7 @@ class MainUI(ctk.CTkFrame):
         text_primary = "#FFFFFF"
 
         # Main Container with dark gaming background
-        self.main_container = ctk.CTkFrame(self, fg_color=dark_bg, corner_radius=0)
+        self.main_container = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self.main_container.pack(fill="both", expand=True)
         
         # Header frame - set height in constructor
@@ -153,7 +155,7 @@ class MainUI(ctk.CTkFrame):
 
         # Right Content Area - Game details
         self.right_content = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        self.right_content.place(relx=0.33, rely=0.02, relwidth=0.65, relheight=0.96)
+        self.right_content.place(relx=1.0, rely=0.02, relwidth=0.65, relheight=0.96)
 
         self.image_frame = ctk.CTkFrame(
             self.right_content, 
@@ -272,6 +274,7 @@ class MainUI(ctk.CTkFrame):
             self.screenshot_items.append(btn)
 
     def switch_tab(self, tab_name):
+        self.sounds["tab"].play()
         self.current_tab = tab_name
         
         accent_color = "#FF5722"
@@ -476,13 +479,11 @@ class MainUI(ctk.CTkFrame):
                     image_width = int(self.master.winfo_screenwidth() * 0.6)
                     image_height = int(self.master.winfo_screenheight() * 0.4)
 
-                    print(f"Loading image from: {image_path}")
-                    try:
-                        img = Image.open(image_path)
-                        ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(image_width, image_height))
-                        self.image_label.configure(image=ctk_img)
-                    except FileNotFoundError:
-                        self.image_label.configure(image=None, text="Image not found")
+                    threading.Thread(
+                        target=self.fade_image,
+                        args=(image_path, image_width, image_height),
+                        daemon=True
+                    ).start()
 
                     text = self.read_txt(game_name)
                     self.desc_label.configure(
@@ -501,6 +502,7 @@ class MainUI(ctk.CTkFrame):
 
                     current_scroll = self.scroll_frame._parent_canvas.yview()[0]
                     self.animate_scroll(current_scroll, scroll_fraction, self.scroll_frame)
+                    self.animate_slide_in()
                 else:
                     button.set_selected(False)
 
@@ -548,8 +550,60 @@ class MainUI(ctk.CTkFrame):
         
         step(1)
 
+    def animate_slide_in(self):
+        target_relx = 0.33
+        current_relx = self.right_content.place_info().get('relx')
+        if current_relx is None:
+            current_relx = 1.0
+        else:
+            current_relx = float(current_relx)
+
+        distance = target_relx - current_relx
+        steps = 10
+        step_size = distance / steps
+
+        def step(current_step):
+            if current_step <= steps:
+                new_relx = current_relx + (step_size * current_step)
+                self.right_content.place(relx=new_relx)
+                self.after(15, lambda: step(current_step + 1))
+
+        step(1)
+
+    def fade_image(self, new_image_path, target_width, target_height):
+        try:
+            new_image = Image.open(new_image_path)
+            new_image = new_image.resize((target_width, target_height), Image.LANCZOS)
+
+            # Fade out
+            for i in range(10, -1, -1):
+                alpha = i / 10
+                if hasattr(self, "_current_image_pil"):
+                    faded_image = Image.blend(self._current_image_pil, Image.new('RGBA', self._current_image_pil.size, (0,0,0,0)), 1 - alpha)
+                    faded_tk = ImageTk.PhotoImage(faded_image)
+                    self.image_label.configure(image=faded_tk)
+                    self.update()
+                    time.sleep(0.02)
+
+            self._current_image_pil = new_image.convert("RGBA")
+
+            # Fade in
+            for i in range(11):
+                alpha = i / 10
+                faded_image = Image.blend(Image.new('RGBA', self._current_image_pil.size, (0,0,0,0)), self._current_image_pil, alpha)
+                faded_tk = ImageTk.PhotoImage(faded_image)
+                self.image_label.configure(image=faded_tk)
+                self.update()
+                time.sleep(0.02)
+
+        except FileNotFoundError:
+            self.image_label.configure(image=None, text="Image not found")
+        except Exception as e:
+            print(f"Error fading image: {e}")
+            self.image_label.configure(image=None, text="Error loading image")
 
     def move_up(self, event):
+        self.sounds["navigate"].play()
         if self.current_tab == "GAMES":
             if self.games_selected_index > 0:
                 self.games_selected_index -= 1
@@ -560,6 +614,7 @@ class MainUI(ctk.CTkFrame):
                 self.update_selection()
 
     def move_down(self, event):
+        self.sounds["navigate"].play()
         if self.current_tab == "GAMES":
             if self.games_selected_index < len(self.items) - 1:
                 self.games_selected_index += 1
@@ -570,6 +625,7 @@ class MainUI(ctk.CTkFrame):
                 self.update_selection()
     
     def select_item(self, event=None):
+        self.sounds["select"].play()
         if self.current_tab == "GAMES":
             if self.items and self.games_selected_index < len(self.items):
                 game_name = self.items[self.games_selected_index].cget("text")
@@ -651,6 +707,17 @@ class MainApplication(ctk.CTk):
         self.last_closing_attempt = time.time()
         self.main_ui = None
 
+        self.background = AnimatedBackground(self)
+        self.background.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        # Initialize pygame mixer
+        pygame.mixer.init()
+        self.sounds = {
+            "navigate": pygame.mixer.Sound(f"{current_path}/assets/sounds/navigate.wav"),
+            "select": pygame.mixer.Sound(f"{current_path}/assets/sounds/select.wav"),
+            "tab": pygame.mixer.Sound(f"{current_path}/assets/sounds/tab.wav")
+        }
+
         self.listener = subprocess.Popen(["sudo","python3",f"{current_path}/src/gpio_listener.py"])
 
         self.splash_screen = SplashScreen(self, on_close=self.show_main_ui)
@@ -658,7 +725,10 @@ class MainApplication(ctk.CTk):
 
     def show_main_ui(self):
         self.splash_screen.destroy()
-        self.main_ui = MainUI(self)
+        self.main_ui = MainUI(self, self.sounds)
+        self.main_ui.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.background.lower()
+        self.main_ui.lift()
         self.fade_in_main()
         self.set_focus()
 
